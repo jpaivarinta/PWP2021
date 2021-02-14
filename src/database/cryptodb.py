@@ -1,7 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from datetime import datetime
 
 app = Flask(__name__)
@@ -11,14 +9,9 @@ db = SQLAlchemy(app)
 
 cryptoPortfolio = db.Table("cryptoPortfolio",
     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
-    db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True)
+    db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),
+    db.Column("amount", db.Float, nullable=False)
 )
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
 
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
