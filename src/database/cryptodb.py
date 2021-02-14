@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from datetime import datetime
 
 app = Flask(__name__)
@@ -12,6 +14,12 @@ cryptoPortfolio = db.Table("cryptoPortfolio",
     db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True)
 )
 
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
@@ -19,19 +27,19 @@ class UserAccount(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"))
 
     portfolio = db.relationship("Portfolio", back_populates="useraccount")
-    pass
 
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     value = db.Column(db.Float, nullable=False) #How to accept only positive?
 
-    cryptocurrencies = db.relationship("Cryptocurrency", secondary=cryptoPortfolio, back_populates="portfolios")
+    cryptocurrencies = db.relationship("CryptoCurrency", secondary=cryptoPortfolio, back_populates="portfolios")
     useraccount = db.relationship("UserAccount", back_populates="portfolio")
 
-    pass
+    
 
 class CryptoCurrency(db.Model):
+    __tablename__ ="cryptocurrency"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
     abbreviation = db.Column(db.String(12), unique=True, nullable=False)
@@ -42,4 +50,3 @@ class CryptoCurrency(db.Model):
     blockchain_length = db.Column(db.Float)
 
     portfolios = db.relationship("Portfolio", secondary=cryptoPortfolio, back_populates="cryptocurrencies")
-    pass
