@@ -2,9 +2,9 @@ import pytest
 from datetime import datetime
 import tempfile
 import os
+import app
 
-
-from cryptodb import db, UserAccount, Portfolio, CryptoCurrency
+from database.cryptodb import db, UserAccount, Portfolio, CryptoCurrency
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
