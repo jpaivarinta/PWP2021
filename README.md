@@ -1,5 +1,5 @@
 # PWP SPRING 2021
-# PROJECT NAME
+# CryptoMonitoring
 # Group information
 * Joona Päivärinta, jouka.paivarinta@gmail.com
 * Jonne Taipale, jonne.taipale@gmail.com
