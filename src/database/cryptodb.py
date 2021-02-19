@@ -2,15 +2,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cpdata.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 cryptoPortfolio = db.Table("cryptoPortfolio",
     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
     db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),
-    db.Column("amount", db.Float, nullable=False)
+    db.Column("amount", db.Float)
 )
 
 class UserAccount(db.Model):

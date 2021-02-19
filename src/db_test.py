@@ -25,7 +25,6 @@ A more thorough checklist would also include:
 
 """
 
-#db.create_all() 
 
 
 @event.listens_for(Engine, "connect")
@@ -37,15 +36,18 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 @pytest.fixture
 def db_handle():
     db_fd, db_fname = tempfile.mkstemp()
-    app.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
-    app.app.config["TESTING"] = True
 
-    with app.app.app_context():
-    	app.db.create_all()
+    test_app = app.app
+    test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
+    test_app.config["TESTING"] = True
+    db.init_app(test_app)
 
-    yield app.db
+    with test_app.app_context():
+        db.create_all()
 
-    app.db.session.remove()
+        yield db
+
+    db.session.remove()
     os.close(db_fd)
     os.unlink(db_fname)
 
@@ -61,6 +63,7 @@ def _get_Portfolio():
 		timestamp=datetime.now(),
 		value=1234.56
 	)
+    
 def _get_CryptoCurrency():
 	return CryptoCurrency(
 	    name="DogeCoin",
@@ -73,13 +76,28 @@ def _get_CryptoCurrency():
 	)
 
 def test_instance_creation(db_handle):
-	userAccount = _get_UserAccount()
-	portfolio = _get_Portfolio()
-	cryptoCurrency = _get_CryptoCurrency()
-	userAccount.portfolio = portfolio
-	portfolio.cryptocurrencies.append(cryptoCurrency)
+    
+    userAccount = _get_UserAccount()
+    portfolio = _get_Portfolio()
+    cryptoCurrency = _get_CryptoCurrency()
+    userAccount.portfolio = portfolio
+    portfolio.cryptocurrencies.append(cryptoCurrency)
+    db_handle.session.add(userAccount)
+    db_handle.session.add(portfolio)
+    db_handle.session.add(cryptoCurrency)
+    db_handle.session.commit()
 
-	db.session.add(userAccount)
-	db.session.add(portfolio)
-	db.session.add(cryptoCurrency)
-	db.session.commit()
+    # Check existence
+    assert UserAccount.query.count() == 1
+    assert Portfolio.query.count() == 1
+    assert CryptoCurrency.query.count() == 1
+
+    db_user = UserAccount.query.first()
+    db_portfolio = Portfolio.query.first()
+    db_cryptocurreny = CryptoCurrency.query.first()
+
+    # check Relationships
+    assert db_user.portfolio == db_portfolio
+    assert db_user in db_portfolio.useraccount
+    assert db_portfolio in db_cryptocurreny.portfolios
+    assert db_cryptocurreny in db_portfolio.cryptocurrencies  
