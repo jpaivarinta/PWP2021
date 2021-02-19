@@ -4,11 +4,20 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-cryptoPortfolio = db.Table("cryptoPortfolio",
-    db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
-    db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),
-    db.Column("amount", db.Float)
-)
+# cryptoPortfolio = db.Table("cryptoPortfolio",
+#     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
+#     db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),
+#     db.Column("amount", db.Float)
+# )
+
+class crypto_portfolio(db.Model):
+    cryptocurrency_id = db.Column( db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True)
+    portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"), primary_key=True)
+    currencyAmount = db.Column(db.Float, nullable=False)
+
+    portfolio = db.relationship("Portfolio", back_populates="cryptocurrencies")
+    cryptocurrency = db.relationship("CryptoCurrency", back_populates="portfolios")
+
 
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,7 +32,7 @@ class Portfolio(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     value = db.Column(db.Float, nullable=False) #How to accept only positive?
 
-    cryptocurrencies = db.relationship("CryptoCurrency", secondary=cryptoPortfolio, back_populates="portfolios")
+    cryptocurrencies = db.relationship("crypto_portfolio",  back_populates="portfolio")
     useraccount = db.relationship("UserAccount", back_populates="portfolio")
 
     
@@ -39,4 +48,4 @@ class CryptoCurrency(db.Model):
     launchDate = db.Column(db.DateTime)
     blockchain_length = db.Column(db.Float)
 
-    portfolios = db.relationship("Portfolio", secondary=cryptoPortfolio, back_populates="cryptocurrencies")
+    portfolios = db.relationship("crypto_portfolio", back_populates="cryptocurrency")

@@ -4,7 +4,7 @@ import tempfile
 import os
 import app
 
-from database.cryptodb import db, UserAccount, Portfolio, CryptoCurrency
+from database.cryptodb import db, UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
@@ -81,23 +81,29 @@ def test_instance_creation(db_handle):
     portfolio = _get_Portfolio()
     cryptoCurrency = _get_CryptoCurrency()
     userAccount.portfolio = portfolio
-    portfolio.cryptocurrencies.append(cryptoCurrency)
+    cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=cryptoCurrency, currencyAmount=44.444)
+    portfolio.cryptocurrencies.append(cp)
+
     db_handle.session.add(userAccount)
     db_handle.session.add(portfolio)
     db_handle.session.add(cryptoCurrency)
+
+    db_handle.session.add(cp)
     db_handle.session.commit()
 
     # Check existence
     assert UserAccount.query.count() == 1
     assert Portfolio.query.count() == 1
     assert CryptoCurrency.query.count() == 1
+    assert crypto_portfolio.query.count() == 1
 
     db_user = UserAccount.query.first()
     db_portfolio = Portfolio.query.first()
     db_cryptocurreny = CryptoCurrency.query.first()
+    db_cp = crypto_portfolio.query.first()
 
     # check Relationships
     assert db_user.portfolio == db_portfolio
     assert db_user in db_portfolio.useraccount
-    assert db_portfolio in db_cryptocurreny.portfolios
-    assert db_cryptocurreny in db_portfolio.cryptocurrencies  
+    assert db_portfolio == db_cp.portfolio
+    assert db_cryptocurreny == db_cp.cryptocurrency  
