@@ -7,6 +7,7 @@ import app
 from database.cryptodb import db, UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+from sqlalchemy.exc import IntegrityError
 
 
 """
@@ -75,8 +76,33 @@ def _get_CryptoCurrency():
 	    blockchain_length=3610463
 	)
 
+def _get_UserAccount2():
+	return UserAccount(
+		name="test_user2",
+		password="asdfg",
+	)
+
+def _get_Portfolio2():
+	return Portfolio(
+		timestamp=datetime.now(),
+		value=1234.56
+	)
+
+def _get_CryptoCurrency2():
+	return CryptoCurrency(
+	    name="Bitcoin",
+	    abbreviation="BTC",
+	    timestamp=datetime.now(),
+	    value=50000.00,
+	    daily_growth=7.1,
+	    launchDate=datetime(2012,5,12),
+	    blockchain_length=3610463
+	)
+
 def test_instance_creation(db_handle):
-    
+    """ 
+    Test for instance creation, their existence, and relationships. 
+    """
     userAccount = _get_UserAccount()
     portfolio = _get_Portfolio()
     cryptoCurrency = _get_CryptoCurrency()
@@ -107,3 +133,83 @@ def test_instance_creation(db_handle):
     assert db_user in db_portfolio.useraccount
     assert db_portfolio == db_cp.portfolio
     assert db_cryptocurreny == db_cp.cryptocurrency  
+
+def test_cryptoportfolio_currency_one(db_handle):
+  """ 
+  Test if the same currency cannot be added twice to the same portfolio. 
+  """
+  usr = _get_UserAccount()
+  portfolio = _get_Portfolio()
+  currency =_get_CryptoCurrency()
+  
+  cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  cp2 = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  usr.portfolio = portfolio
+  portfolio.cryptocurrencies.append(cp)
+  db_handle.session.add(usr)
+  db_handle.session.add(portfolio)
+  db_handle.session.add(currency)
+  db_handle.session.add(cp)
+
+  with pytest.raises(IntegrityError):
+      db_handle.session.commit()
+
+def test_addSecondCurrencyToPortfolio(db_handle):
+  """ 
+  Test if another cryptocurrency can be added to portfolio. 
+  """
+  usr = _get_UserAccount()
+  portfolio = _get_Portfolio()
+  currency = _get_CryptoCurrency()
+  currency2 = _get_CryptoCurrency2()
+  
+  cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  cp2 = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency2, currencyAmount=44.444)
+  usr.portfolio = portfolio
+  portfolio.cryptocurrencies.append(cp)
+  portfolio.cryptocurrencies.append(cp2)
+
+  db_handle.session.add(usr)
+  db_handle.session.add(portfolio)
+  db_handle.session.add(currency)
+  db_handle.session.add(cp)
+  db_handle.session.add(cp2)
+
+  db_handle.session.commit()
+
+  db_portfolio = Portfolio.query.first()
+  assert crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).count()==2
+
+def test_RemoveCurrencFromPortfolio(db_handle):
+  """ 
+  Test if a currency can be removed from portfolio.
+  """
+  usr = _get_UserAccount()
+  portfolio = _get_Portfolio()
+  currency = _get_CryptoCurrency()
+  currency2 = _get_CryptoCurrency2()
+  
+  cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  cp2 = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency2, currencyAmount=44.444)
+  usr.portfolio = portfolio
+  portfolio.cryptocurrencies.append(cp)
+  
+
+  db_handle.session.add(usr)
+  db_handle.session.add(portfolio)
+  db_handle.session.add(currency)
+  db_handle.session.add(cp)
+  
+
+  db_handle.session.commit()
+
+  db_portfolio = Portfolio.query.first()
+  assert crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).count()==2
+
+  db_currency = CryptoCurrency.query.filter_by(abbreviation="BTC").first()
+  db_cp = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id, cryptocurrency_id=db_currency.id).first()
+  db_handle.session.delete(db_cp)
+  db_handle.session.commit()
+
+  assert crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).count()==1
+  
