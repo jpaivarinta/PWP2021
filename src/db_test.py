@@ -213,3 +213,118 @@ def test_RemoveCurrencFromPortfolio(db_handle):
 
   assert crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).count()==1
   
+def test_get_portfolios_by_currency(db_handle):
+  """ 
+  Test getting portfolios having certain cryptocurrency
+  """
+  usr = _get_UserAccount()
+  usr2 = _get_UserAccount2()
+
+  portfolio = _get_Portfolio()
+  portfolio2 = _get_Portfolio2()
+
+  currency = _get_CryptoCurrency()
+  
+  
+  cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  cp2 = crypto_portfolio(portfolio=portfolio2, cryptocurrency=currency, currencyAmount=20.444)
+
+  usr.portfolio = portfolio
+  usr2.portfolio = portfolio2
+  portfolio.cryptocurrencies.append(cp)
+  portfolio2.cryptocurrencies.append(cp2)
+  
+
+  db_handle.session.add(usr)
+  db_handle.session.add(usr2)
+
+  db_handle.session.add(portfolio)
+  db_handle.session.add(portfolio2)
+
+  db_handle.session.add(currency)
+  db_handle.session.add(cp)
+  db_handle.session.add(cp2)
+  
+
+  db_handle.session.commit()
+
+  db_currency = CryptoCurrency.query.first()
+
+  assert crypto_portfolio.query.filter_by(cryptocurrency_id=db_currency.id).count()==2
+
+def test_get_portfolios_by_currency(db_handle):
+  """ 
+  Test getting portfolios having certain cryptocurrency
+  """
+  usr = _get_UserAccount()
+  usr2 = _get_UserAccount2()
+
+  portfolio = _get_Portfolio()
+  portfolio2 = _get_Portfolio2()
+
+  currency = _get_CryptoCurrency()
+  
+  
+  cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+  cp2 = crypto_portfolio(portfolio=portfolio2, cryptocurrency=currency, currencyAmount=20.444)
+
+  usr.portfolio = portfolio
+  usr2.portfolio = portfolio2
+  portfolio.cryptocurrencies.append(cp)
+  portfolio2.cryptocurrencies.append(cp2)
+  
+
+  db_handle.session.add(usr)
+  db_handle.session.add(usr2)
+
+  db_handle.session.add(portfolio)
+  db_handle.session.add(portfolio2)
+
+  db_handle.session.add(currency)
+  db_handle.session.add(cp)
+  db_handle.session.add(cp2)
+  
+
+  db_handle.session.commit()
+
+  db_currency = CryptoCurrency.query.first()
+
+  assert crypto_portfolio.query.filter_by(cryptocurrency_id=db_currency.id).count()==2
+
+def test_update_currencyamount(db_handle):
+    """ 
+    Test updating currency amount in portfolio
+    NOTE: might be redundant test
+    """
+    usr = _get_UserAccount()
+
+    portfolio = _get_Portfolio()
+
+    currency = _get_CryptoCurrency()
+
+    cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+
+    usr.portfolio = portfolio
+    portfolio.cryptocurrencies.append(cp)
+
+
+    db_handle.session.add(usr)
+
+    db_handle.session.add(portfolio)
+
+    db_handle.session.add(currency)
+    db_handle.session.add(cp)
+
+    db_handle.session.commit()
+
+    # update user's portfolio's certain currencyamount
+    db_user = UserAccount.query.first()
+    db_currency = CryptoCurrency.query.first()
+    db_cp = crypto_portfolio.query.filter_by(portfolio_id=db_user.portfolio.id, cryptocurrency_id=db_currency.id).first()
+
+    assert db_cp.currencyAmount == 44.444
+
+    db_cp.currencyAmount=2
+    db_handle.session.commit()
+
+    assert db_cp.currencyAmount == 2
