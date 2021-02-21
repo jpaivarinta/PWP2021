@@ -116,7 +116,7 @@ def test_instance_creation(db_handle):
 
     # check Relationships
     assert db_user.portfolio == db_portfolio
-    assert db_user in db_portfolio.useraccount
+    assert db_user == db_portfolio.useraccount
     assert db_portfolio == db_cp.portfolio
     assert db_cryptocurreny == db_cp.cryptocurrency  
 
@@ -311,3 +311,52 @@ def test_update_currencyamount(db_handle):
     db_handle.session.commit()
 
     assert db_cp.currencyAmount == 2
+
+def test_delete_user(db_handle):
+    """ 
+    Test deleting user, portfolio, bulkdeleting crypto_portfolios
+    NOTE: might be redundant test
+    """
+    usr = _get_UserAccount()
+
+    portfolio = _get_Portfolio()
+    portfolio2 = _get_Portfolio2()
+
+    currency = _get_CryptoCurrency()
+    currency2 = _get_CryptoCurrency2()
+
+    cp = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency, currencyAmount=44.444)
+    cp2 = crypto_portfolio(portfolio=portfolio,cryptocurrency=currency2, currencyAmount=400.0)
+    cp3 = crypto_portfolio(portfolio=portfolio2, cryptocurrency=currency, currencyAmount=9.0)
+
+    usr.portfolio = portfolio
+    portfolio.cryptocurrencies.append(cp)
+    portfolio.cryptocurrencies.append(cp2)
+
+    portfolio2.cryptocurrencies.append(cp3)
+
+    db_handle.session.add(usr)
+
+    db_handle.session.add(portfolio)
+
+    db_handle.session.add(currency)
+    db_handle.session.add(currency2)
+    db_handle.session.add(cp)
+    db_handle.session.add(cp2)
+    db_handle.session.add(cp3)
+
+    db_handle.session.commit()
+
+    assert crypto_portfolio.query.count()==3
+
+    db_user = UserAccount.query.first()
+    db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
+    bulk_delete_query = crypto_portfolio.__table__.delete().where(crypto_portfolio.portfolio_id==db_portfolio.id)
+    db_handle.session.execute(bulk_delete_query)
+    db_handle.session.delete(db_portfolio) 
+    db_handle.session.delete(db_user)
+    db_handle.session.commit()
+
+    assert crypto_portfolio.query.count() == 1
+
+    

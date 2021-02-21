@@ -25,15 +25,16 @@ class UserAccount(db.Model):
     password = db.Column(db.String(256), nullable=False) #is this necessary?
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"))
 
-    portfolio = db.relationship("Portfolio", back_populates="useraccount")
+    portfolio = db.relationship("Portfolio", back_populates="useraccount", uselist=False)
 
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
     value = db.Column(db.Float, nullable=False) #How to accept only positive?
+    # useraccount_id = db.Column(db.Integer, db.ForeignKey("user_account.id"))
 
     cryptocurrencies = db.relationship("crypto_portfolio",  back_populates="portfolio")
-    useraccount = db.relationship("UserAccount", back_populates="portfolio")
+    useraccount = db.relationship("UserAccount", back_populates="portfolio", uselist=False)
 
     
 
