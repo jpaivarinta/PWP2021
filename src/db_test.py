@@ -11,22 +11,8 @@ from sqlalchemy.exc import IntegrityError
 
 
 """
-*** TESTING DATABASE ***
-
-- an instance of each model can be created, and they can be found 
-  from database afterward
-- foreign key relationships are created correctly ondelete and onmodify 
-  behaviors for foreign keys work as intended
-
-A more thorough checklist would also include:
-- test uniqueness of columns by trying to create objects that violate each 
-  individual unique column
-- test that columns have their nullable attribute set correctly
-- test that column types and restrictions have been set correctly
-
+*** DATABASE TESTS ***
 """
-
-
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -180,7 +166,7 @@ def test_addSecondCurrencyToPortfolio(db_handle):
   db_portfolio = Portfolio.query.first()
   assert crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).count()==2
 
-def test_RemoveCurrencFromPortfolio(db_handle):
+def test_removeCurrencyFromPortfolio(db_handle):
   """ 
   Test if a currency can be removed from portfolio.
   """
@@ -193,14 +179,11 @@ def test_RemoveCurrencFromPortfolio(db_handle):
   cp2 = crypto_portfolio(portfolio=portfolio, cryptocurrency=currency2, currencyAmount=44.444)
   usr.portfolio = portfolio
   portfolio.cryptocurrencies.append(cp)
-  
 
   db_handle.session.add(usr)
   db_handle.session.add(portfolio)
   db_handle.session.add(currency)
   db_handle.session.add(cp)
-  
-
   db_handle.session.commit()
 
   db_portfolio = Portfolio.query.first()
