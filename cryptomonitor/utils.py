@@ -68,6 +68,44 @@ class CryptoMonitorBuilder(MasonBuilder):
     def cryptomonitor_schema():
         pass
 
+    def add_control_all_accounts(self):
+        self.add_control(
+            "crymo:accounts-all",
+            href=api.url_for("api.accounts"),
+            method="GET",
+            encoding="JSON"
+        )
+
+    #ACCOUNT controls
+    def add_control_add_account(self):
+        pass
+
+    def add_control_edit_account(self, account_id):
+        pass
+
+
+    def add_control_delete_account(self, account_id):
+        pass
+
+
+    #PCURRENCY controls
+    def add_control_all_pcurrencies(self):
+        pass
+
+    def add_control_add_pcurrency(self):
+        pass
+
+    def add_control_delete_pcurrency(self, pcurrency_id):
+        pass
+
+
+    #CRYPTOCURRENCY controls
+    def add_control_all_currencies(self):
+        pass
+    
+
+
+
 
 def create_error_response(status_code, title, message=None):
     resource_url = request.path
