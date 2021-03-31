@@ -18,6 +18,9 @@ class crypto_portfolio(db.Model):
     portfolio = db.relationship("Portfolio", back_populates="cryptocurrencies")
     cryptocurrency = db.relationship("CryptoCurrency", back_populates="portfolios")
 
+    @staticmethod
+    def get_schema():
+        pass
 
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +29,23 @@ class UserAccount(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"))
 
     portfolio = db.relationship("Portfolio", back_populates="useraccount", uselist=False)
+
+    @staticmethod
+    def get_schema():
+        schema = {
+            "type": "object",
+            "required": ["name", "password"]
+        }
+        props = schema["properties"] = {}
+        props["name"] = {
+            "description": "Name of user",
+            "type": "string"
+        }
+        props["password"] = {
+            "description": "Password of account",
+            "type": "string"
+        }
+        return schema
 
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,7 +56,9 @@ class Portfolio(db.Model):
     cryptocurrencies = db.relationship("crypto_portfolio",  back_populates="portfolio")
     useraccount = db.relationship("UserAccount", back_populates="portfolio", uselist=False)
 
-    
+    @staticmethod
+    def get_schema():
+        pass
 
 class CryptoCurrency(db.Model):
     __tablename__ ="cryptocurrency"
@@ -50,3 +72,7 @@ class CryptoCurrency(db.Model):
     blockchain_length = db.Column(db.Float)
 
     portfolios = db.relationship("crypto_portfolio", back_populates="cryptocurrency")
+
+    @staticmethod
+    def get_schema():
+        pass
