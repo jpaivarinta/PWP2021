@@ -65,10 +65,39 @@ class MasonBuilder(dict):
 class CryptoMonitorBuilder(MasonBuilder):
 
     @staticmethod
-    def cryptomonitor_schema():
+    def account_schema():
+        schema = {
+            "type": "object",
+            "required": ["name", "password"]
+        }
+        props = schema["properties"] = {}
+        props["name"] = {
+            "description": "Name of user",
+            "type": "string"
+        }
+        props["password"] = {
+            "description": "Password of account",
+            "type": "string"
+        }
+        return schema
+
+    @staticmethod
+    def portfolio_schema():
         pass
 
+    @staticmethod
+    def pcurrency_schema(): #IS THIS ONE NEEDED?
+        pass
+
+
+
+
+    """ ACCOUNT controls """
+
     def add_control_all_accounts(self):
+        """
+        Adds control for all accounts in the response body.
+        """
         self.add_control(
             "crymo:accounts-all",
             href=api.url_for("api.accounts"),
@@ -76,19 +105,51 @@ class CryptoMonitorBuilder(MasonBuilder):
             encoding="JSON"
         )
 
-    #ACCOUNT controls
+ 
     def add_control_add_account(self):
-        pass
+        """
+        Adds control for adding an account in the response body.
+        """
+        self.add_control(
+            "crymo:add-account",
+            href=api.url_for("api.accounts"),
+            method="POST",
+            encoding="JSON",
+            title="Add new account",
+            schema=self.account_schema()
+
+        )
 
     def add_control_edit_account(self, account_id):
-        pass
+        """
+        Adds control for editing an account in the response body.
+        : param int account id: The ID of the editable account.
+        """
+        self.add_control(
+            "edit",
+            href=api.url_for("api.accounts", id=account_id),
+            method="PUT",
+            encoding="JSON",
+            title="Edit account",
+            schema=self.account_schema()
+        )
 
 
     def add_control_delete_account(self, account_id):
-        pass
+        """
+        Adds control for deleting an account in the response body.
+        : param int account_id: The is of the deletable account.
+        """
+        self.add_control(
+            "crymo:delete",
+            href=api.url_for("api.accounts", id=account_id),
+            method="DELETE",
+            title="Delete this account"
+        )
 
 
-    #PCURRENCY controls
+    """ PCURRENCY controls """
+
     def add_control_all_pcurrencies(self):
         pass
 
@@ -99,7 +160,8 @@ class CryptoMonitorBuilder(MasonBuilder):
         pass
 
 
-    #CRYPTOCURRENCY controls
+    """ CRYPTOCURRENCY controls """
+
     def add_control_all_currencies(self):
         pass
     
