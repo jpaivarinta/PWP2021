@@ -1,3 +1,7 @@
+import json
+from flask import Response, request, url_for
+from .models import UserAccount, Portfolio, CryptoCurrency
+
 class MasonBuilder(dict):
     """
     A convenience class for managing dictionaries that represent Mason
@@ -104,7 +108,6 @@ class CryptoMonitorBuilder(MasonBuilder):
             method="GET",
             encoding="JSON"
         )
-
  
     def add_control_add_account(self):
         """
@@ -133,7 +136,6 @@ class CryptoMonitorBuilder(MasonBuilder):
             title="Edit account",
             schema=self.account_schema()
         )
-
 
     def add_control_delete_account(self, account_id):
         """
@@ -166,10 +168,10 @@ class CryptoMonitorBuilder(MasonBuilder):
         pass
     
 
-
-
-
 def create_error_response(status_code, title, message=None):
+    """
+    Creates error response with status code, title and message.
+    """
     resource_url = request.path
     body = MasonBuilder(resource_url=resource_url)
     body.add_error(title, message)

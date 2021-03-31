@@ -1,6 +1,6 @@
 from flask_restful import Resource, Api
 from flask import request, Response
-from ..cryptodb import UserAccount
+from ..models import UserAccount
 from ..utils import CryptoMonitorBuilder, create_error_response
 
 
@@ -21,7 +21,12 @@ class Accounts(Resource):
         """
             Add control stuff here
         """
-
+            item.add_control(
+                "self",
+                api.url_for("api.accounts", id=single_account.id)
+            )
+            item.add_control("profile", ACCOUNT_PROFILE)
+            body["items"].append(item)
 
 
         """
@@ -32,7 +37,6 @@ class Accounts(Resource):
             response=json.dumps(body),
             mimetype=MASON
         )
-
 
     def post(self):
         if not request.json:

@@ -5,7 +5,7 @@ from flask import Response
 from ..api import api
 from ..utils import CryptoMonitorBuilder
 from ..utils import create_error_response
-from ..cryptodb import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
+from ..models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
 MASON = "application/vnd.mason+json"
 PROFILE = "profiles/portfolio"
