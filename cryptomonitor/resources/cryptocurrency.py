@@ -7,6 +7,6 @@ class CryptoCurrency(Resource):
     def get(self, name):
         pass
 
-class CryptoCurrencies(Resource):
+class CryptoCurrencyCollection(Resource):
     def get(self):
         pass
