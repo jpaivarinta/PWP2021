@@ -1,5 +1,5 @@
 .vscode/
-
+.venv/
 pwp-2021/
 .db
 */__pycache__
