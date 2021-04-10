@@ -14,8 +14,7 @@ class PortfolioItem(Resource):
         if db_user is None:
             return create_error_response(
                 404,
-                "Account doesn't exist",
-                "User doesn't exist, so portfolio cannot be returned"
+                "Account doesn't exist"
             )
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         body = CryptoMonitorBuilder(timestamp=db_portfolio.timestamp,
