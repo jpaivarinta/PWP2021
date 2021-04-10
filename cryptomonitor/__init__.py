@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from cryptomonitor.constants import *
+from constants import *
 
 db = SQLAlchemy()
 

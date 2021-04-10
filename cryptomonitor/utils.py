@@ -1,6 +1,6 @@
 import json
 from flask import Response, request, url_for
-from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency
+from .models import UserAccount, Portfolio, CryptoCurrency
 
 class MasonBuilder(dict):
     """
@@ -198,7 +198,7 @@ class CryptoMonitorBuilder(MasonBuilder):
             title="Edit pcurrency in portfolio"
         )
 
-    def add_control_get_currency_info(self, currencyname):
+    def add_control_get_currency_info(self, currencyname)
         """ 
         Add control for getting cryptocurrency info.
         """

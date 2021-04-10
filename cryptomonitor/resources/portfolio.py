@@ -1,5 +1,6 @@
 import json
 from flask_restful import Resource
+from flask_restful import Api
 from flask import Response
 from cryptomonitor.api import api
 from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
