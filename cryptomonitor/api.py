@@ -1,17 +1,10 @@
-from flask import Flask
-from flask import request
+from flask import Blueprint
 from flask_restful import Api
-import json
-from flask_sqlalchemy import SQLAlchemy
-from database.cryptodb import db
 
-# db.init_app(app=crea)
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database//cpdata.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-api = Api(app)
+from cryptomonitor.resources.account import AccountCollection, AccountItem
 
-# db.create_all()
-@app.route("/")
-def index():
-    return "hello"
+api_bp = Blueprint("api", __name__, url_prefix="/api")
+api = Api(api_bp)
+
+api.add_resource(AccountCollection, "/accounts/")
+api.add_resource(AccountItem, "/accounts/<account>/")
