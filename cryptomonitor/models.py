@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from cryptomonitor import db
 
-db = SQLAlchemy()
 
 # cryptoPortfolio = db.Table("cryptoPortfolio",
 #     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),

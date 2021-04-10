@@ -1,0 +1,12 @@
+setup.py
+cryptomonitor.egg-info/PKG-INFO
+cryptomonitor.egg-info/SOURCES.txt
+cryptomonitor.egg-info/dependency_links.txt
+cryptomonitor.egg-info/not-zip-safe
+cryptomonitor.egg-info/requires.txt
+cryptomonitor.egg-info/top_level.txt
+resources/__init__.py
+resources/account.py
+resources/cryptocurrency.py
+resources/portfolio.py
+resources/portfoliocurrency.py
