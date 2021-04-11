@@ -67,12 +67,12 @@ class AccountCollection(Resource):
 
 class AccountItem(Resource):
 
-    def get(self, account_id):
-        single_account = UserAccount.query.filter_by(id=account_id).first()
+    def get(self, account_name):
+        single_account = UserAccount.query.filter_by(name=account_name).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by id: {}".format(account_id)
+                "Account not found by name: {}".format(account_name)
             )
 
         body = CryptoMonitorBuilder(
@@ -81,24 +81,25 @@ class AccountItem(Resource):
             portfolio_id=single_account.portfolio_id
         )
 
-        body.add_control("self", url_for("api.accountitem", account_id=account.id))
-        body.add_control("profile", ACCOUNT_PROFILE)
+        body.add_control("self", url_for("api.accountitem", account_name=account_name))
+        body.add_control("profile", ACCOUNT_PROFILE) 
+        body.add_control("portfolio", url_for("api.portfolioitem"), id=single_account.portfolio_id)
         body.add_control_all_accounts()
-        body.add_control_edit_account(account_id=account_id)
-        body.add_control_delete_account(account_id=account_id)
+        body.add_control_edit_account(account_name=account_name)
+        body.add_control_delete_account(account_name=account_name)
         body.add_namespace("crymo", LINK_RELATIONS_URL)
 
         return Response(response=json.dumps(body), status=200, mimetype=MASON)
 
-    def put(self, account_id):
+    def put(self, account_name):
         """
         PUT method for editing account resource
         """
-        single_account = UserAccount.query.filter_by(id=account_id).first()
+        single_account = UserAccount.query.filter_by(name=account_name).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by id: {}".format(account_id)
+                "Account not found by name: {}".format(account_name)
             )
         if not request.json:
             return create_error_response(
@@ -132,12 +133,12 @@ class AccountItem(Resource):
         )
 
 
-    def delete(self, account_id):
-        single_account = UserAccount.query.filter_by(id=account_id).first()
+    def delete(self, account_name):
+        single_account = UserAccount.query.filter_by(name=account_name).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by id {}".format(account_id)
+                "Account not found by name {}".format(account_name)
             )
         db.session.delete(single_account)
         db.session.commit()
