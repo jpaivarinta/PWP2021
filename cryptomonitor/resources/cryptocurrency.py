@@ -12,19 +12,20 @@ class CryptoCurrencyItem(Resource):
     def get(self, name):
         currency = CryptoCurrency.query.filter_by(name=name).first()
         if currency is None:
-            return create_error_response(404, "Currency not in database", "Cryptocurrency doesn't exist in the database")
+            return create_error_response(404, "Currency not in database")
 
         body = CryptoMonitorBuilder(
             name=currency.name,
             abbreviation=currency.abbreviation,
             timestamp=currency.timestamp,
-            value=currency.name,
+            value=currency.value,
             daily_growth=currency.daily_growth
         )
 
         body.add_namespace("crymo", "/cryptometa/link-relations#")
         body.add_control("self", api.url_for(CryptoCurrency, id=currency.id))
         body.add_control_all_currencies()
+        body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
         return Response(json.dumps(body), 200, mimetype=MASON)
 
@@ -34,6 +35,7 @@ class CryptoCurrencyCollection(Resource):
 
         body.add_namespace("crymo", "/cryptometa/link-relations#")
         body.add_control("self", "/currencies/")
+        body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
 
         for currency in CryptoCurrency.query.all():
@@ -41,7 +43,7 @@ class CryptoCurrencyCollection(Resource):
                 name=currency.name,
                 abbreviation=currency.abbreviation,
                 timestamp=currency.timestamp,
-                value=currency.name,
+                value=currency.value,
                 daily_growth=currency.daily_growth
             )
             item.add_control("self", api.url_for(CryptoCurrency, id=currency.id))
