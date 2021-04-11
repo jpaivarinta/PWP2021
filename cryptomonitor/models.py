@@ -19,7 +19,20 @@ class crypto_portfolio(db.Model):
 
     @staticmethod
     def get_schema():
-        pass
+        schema = {
+            "type": "object",
+            "required": ["currencyname", "currencyamount"]
+        }
+        props = schema["properties"] = {}
+        props["currencyname"] = {
+            "description": "Abbreviation of currency",
+            "type": "string"
+        }
+        props["currencyamount"] = {
+            "description": "Amount of currency",
+            "type": "string"
+        }
+        return schema
 
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
