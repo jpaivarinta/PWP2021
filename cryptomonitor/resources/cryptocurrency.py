@@ -37,15 +37,15 @@ class CryptoCurrencyCollection(Resource):
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
 
-        # for currency in CryptoCurrency.query.all():
-        #     item = CryptoMonitorBuilder(
-        #         name=currency.name,
-        #         abbreviation=currency.abbreviation,
-        #         timestamp=currency.timestamp,
-        #         value=currency.value,
-        #         daily_growth=currency.daily_growth
-        #     )
-        #     item.add_control("self", url_for("api.cryptocurrencyitem", currency=currency.abbreviation )
-            # item.add_control("profile", CCURRENCY_PROFILE)
-            # body["items"].append(item)
+        for currency in CryptoCurrency.query.all():
+            item = CryptoMonitorBuilder(
+                name=currency.name,
+                abbreviation=currency.abbreviation,
+                timestamp=currency.timestamp,
+                value=currency.value,
+                daily_growth=currency.daily_growth
+            )
+            item.add_control("self", url_for("api.cryptocurrencyitem", currency=currency.abbreviation ))
+            item.add_control("profile", CCURRENCY_PROFILE)
+            body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
