@@ -21,13 +21,13 @@ class AccountCollection(Resource):
                 name=single_account.name,
                 portfolio_id=single_account.portfolio_id
             )
-            item.add_control("self", url_for("api.accountitem", id=single_account.id)) #IS url correct?
+            item.add_control("self", url_for("api.accountitem", account=single_account.name))
             item.add_control("profile", ACCOUNT_PROFILE)
             body["items"].append(item)
 
 
         body.add_control_add_account()
-        body.add_control("self", url_for("api.accounts"))                               #IS url correct?
+        body.add_control("self", url_for("api.accountcollection"))
         body.add_namespace("crymo", LINK_RELATIONS_URL)
 
         #Returning list of all accounts

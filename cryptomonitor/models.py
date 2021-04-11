@@ -1,3 +1,5 @@
+import click
+from flask.cli import with_appcontext
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -88,3 +90,72 @@ class CryptoCurrency(db.Model):
     @staticmethod
     def get_schema():
         pass
+
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    db.create_all()
+
+@click.command("testgen")
+@with_appcontext
+def generate_test_data():
+
+    a1 = UserAccount(
+        name="test-account-1",
+        password="pswd"
+    )
+
+    a2 = UserAccount(
+        name="test-account-2",
+        password="pswd"
+    )
+
+    p1 = Portfolio(
+        timestamp=datetime.now(),
+        value=100.0
+    )
+
+    p2 = Portfolio(
+        timestamp=datetime.now(),
+        value=200.0
+    )
+
+    a1.portfolio = p1
+    a2.portfolio = p2
+
+    c1 = CryptoCurrency(
+        name = "Bitcoin",
+        abbreviation = "BTC",
+        timestamp = datetime.now(),
+        value = 50000.0,
+        daily_growth = 2.5
+    )
+    c1 = CryptoCurrency(
+        name = "Ethereum",
+        abbreviation = "ETH",
+        timestamp = datetime.now(),
+        value = 1700.0,
+        daily_growth = 5.5
+    )
+
+    cp1 = crypto_portfolio(
+        currencyAmount=5.5,
+        cryptocurrency=c1,
+        portfolio=p1
+    )
+
+    cp2 = crypto_portfolio(
+        currencyAmount=6.5,
+        cryptocurrency=c2,
+        portfolio=p2
+    )
+
+    db.session.add(a1)
+    db.session.add(a2)
+    db.session.add(p1)
+    db.session.add(p2)
+    db.session.add(c1)
+    db.session.add(c2)
+    db.session.add(cp1)
+    db.session.add(cp2)
+    db.session.commit()

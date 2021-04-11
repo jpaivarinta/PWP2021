@@ -22,7 +22,7 @@ class CryptoCurrencyItem(Resource):
         )
 
         body.add_namespace("crymo", "/cryptometa/link-relations#")
-        body.add_control("self", url_for("api.cryptocurrencyitem", id=currency.id))
+        body.add_control("self", url_for("api.cryptocurrencyitem", currency=currency.abbreviation))
         body.add_control_all_currencies()
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
@@ -45,7 +45,7 @@ class CryptoCurrencyCollection(Resource):
                 value=currency.value,
                 daily_growth=currency.daily_growth
             )
-            item.add_control("self", api.url_for(CryptoCurrency, id=currency.id))
+            item.add_control("self", url_for("api.cryptocurrencyitem", currency=currency. )
             item.add_control("profile", CCURRENCY_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
