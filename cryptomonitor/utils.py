@@ -164,13 +164,13 @@ class CryptoMonitorBuilder(MasonBuilder):
             title="Cryptocurrencies in account's portfolio"
         )
 
-    def add_control_add_pcurrency(self, account_id, currency):
+    def add_control_add_pcurrency(self, account_name):
         """
         Add control for adding currencies into account's portfolio.
         """
         self.add_control(
             "crymo:add-pcurrency",
-            href=api.url_for("api.pcurrencies", account=account_id, currencyname=currency),
+            href=api.url_for("api.pcurrencies", account=account_name),
             method="POST",
             encoding="JSON",
             title="Add currency to account's portfolio"

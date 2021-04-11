@@ -1,9 +1,8 @@
 import json
 from flask_restful import Resource
 from flask_restful import Api
-from flask import Response
+from flask import Response, url_for
 from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
-from cryptomonitor.api import api
 from cryptomonitor.models import CryptoCurrency
 from cryptomonitor.constants import *
 
@@ -23,7 +22,7 @@ class CryptoCurrencyItem(Resource):
         )
 
         body.add_namespace("crymo", "/cryptometa/link-relations#")
-        body.add_control("self", api.url_for(CryptoCurrency, id=currency.id))
+        body.add_control("self", url_for("api.cryptocurrencyitem", id=currency.id))
         body.add_control_all_currencies()
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
