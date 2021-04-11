@@ -29,9 +29,9 @@ class PortfolioCurrency(Resource):
             launchDate=currency.launchDate, blockchain_length=currency.blockhain_length, currencyAmount=pc.currencyAmount 
             )  
             body.add_namespace("crymo", LINK_RELATIONS_URL)
-            body.add_control("self", api.url_for(PortfolioCurrency, username, currencyname))
+            body.add_control("self", url_for("api.portfoliocurrency", username, currencyname))
             body.add_control("profile", PCURRENCY_PROFILE)
-            body.add_control("collection", api.url_for(PortfolioCurrencyCollection))
+            body.add_control("collection", url_for("api.portfoliocurrencycollection"))
             body.add_control_get_currency_info(currency.abbreviation)
             body.add_control_edit_pcurrency(username, currencyname)
             body.add_control_delete_pcurrency(username, currencyname)
@@ -96,8 +96,8 @@ class PortfolioCurrencyCollection(Resource):
             items = []
         )
         body.add_namespace("crymo", LINK_RELATIONS_URL)
-        base_uri = api.url_for(PortfolioCurrencyCollection, username=username)
-        body.add_control("up", api.url_for("api.PortfolioItem", username=username))
+        base_uri = url_for("portfoliocurrencycollection", username=username)
+        body.add_control("up", url_for("api.portfolioitem", username=username))
         body.add_control("self", base_uri)
         body.add_control_add_pcurrency(username)
 
@@ -112,5 +112,11 @@ class PortfolioCurrencyCollection(Resource):
 
 
     def post(self, username):
-        pass
+        if not request.json:
+            return create_error_response(415, "Unsupported media type")
+        try:
+            validate(request.json, crypto_portfolio.get_schema())
+        except ValidationError as e:
+            return create_error_response(400, "Invalid json document", str(e))
 
+        
