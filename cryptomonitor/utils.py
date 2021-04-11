@@ -123,28 +123,28 @@ class CryptoMonitorBuilder(MasonBuilder):
 
         )
 
-    def add_control_edit_account(self, account_name):
+    def add_control_edit_account(self, account):
         """
         Adds control for editing an account in the response body.
         : param int account id: The ID of the editable account.
         """
         self.add_control(
             "edit",
-            href=url_for("api.accountcollection", name=account_name),
+            href=url_for("api.accountitem", account=account),
             method="PUT",
             encoding="JSON",
             title="Edit account",
             schema=self.account_schema()
         )
 
-    def add_control_delete_account(self, account_name):
+    def add_control_delete_account(self, account):
         """
         Adds control for deleting an account in the response body.
         : param int account_id: The is of the deletable account.
         """
         self.add_control(
             "crymo:delete",
-            href=url_for("api.accountcollection", name=account_name),
+            href=url_for("api.accountitem", account=account),
             method="DELETE",
             title="Delete this account"
         )
@@ -152,62 +152,62 @@ class CryptoMonitorBuilder(MasonBuilder):
 
     """ PCURRENCY controls """
 
-    def add_control_all_pcurrencies(self, account_id):
+    def add_control_all_pcurrencies(self, account):
         """
         Add control for getting all pcurrencies.
         """
         self.add_control(
             "crymo:pcurrencies-all",
-            href= url_for("api.portfoliocurrencycollection", id=account_id),
+            href= url_for("api.portfoliocurrencycollection", account=account),
             method="GET",
             encoding="JSON",
             title="Cryptocurrencies in account's portfolio"
         )
 
-    def add_control_add_pcurrency(self, account_name):
+    def add_control_add_pcurrency(self, account):
         """
         Add control for adding currencies into account's portfolio.
         """
         self.add_control(
             "crymo:add-pcurrency",
-            href= url_for("api.portfoliocurrencycollection", account=account_name),
+            href= url_for("api.portfoliocurrencycollection", account=account),
             method="POST",
             encoding="JSON",
             title="Add currency to account's portfolio"
         )
 
-    def add_control_delete_pcurrency(self, account_id, pcurrency_id):
+    def add_control_delete_pcurrency(self, account, pcurrency):
         """
         Add control for deleting cryptocurrency from account's portfolio. 
         """
         self.add_control(
             "crymo:delete",
-            href=api.url_for("api.pcurrency", account=account_id, pcurrencyId=pcurrency_id),
+            href=api.url_for("api.portfoliocurrency", account=account, pcurrency=pcurrency),
             method="DELETE",
             title="Delete cryptocurrency from the account's portfolio."
         )
         
-    def add_control_edit_pcurrency(self, account_id, currency):
+    def add_control_edit_pcurrency(self, account, pcurrency):
         """ 
         Add control for editing pcurrency.
         """
         self.add_control(
             "edit",
-            href=url_for("api.portfoliocurrencycollection",account=account_id, currencyname=currency),
+            href=url_for("api.portfoliocurrency",account=account, pcurrency=pcurrency),
             method="PUT",
             encoding="JSON",
             title="Edit pcurrency in portfolio"
         )
 
     """ CRYPTOCURRENCY controls """
-    def add_control_get_currency_info(self, currencyname):
+    def add_control_get_currency_info(self, currency):
         """ 
         Add control for getting cryptocurrency info.
         Currencyname is given as abbreviation.
         """
         self.add_control(
             "crymo:currency-info",
-            href=url_for("api.cryptocurrencyitem", currency=currencyname),
+            href=url_for("api.cryptocurrencyitem", currency=currency),
             method="GET",
             encoding="JSON",
             title="Information about cryptocurrency"
@@ -216,11 +216,11 @@ class CryptoMonitorBuilder(MasonBuilder):
     def add_control_all_currencies(self):
         self.add_control(
             "crymo:currencies-all",
-            href=url_for("api.cryptocurrencycollection",
+            href=url_for("api.cryptocurrencycollection"),
             method="GET",
             encoding="JSON",
             title="All CryptoCurrencies")
-        )
+        
     
 
 def create_error_response(status_code, title, message=None):

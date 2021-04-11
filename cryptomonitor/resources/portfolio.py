@@ -8,19 +8,19 @@ from cryptomonitor.constants import *
 
 
 class PortfolioItem(Resource):
-    def get(self, username):
-        db_user = UserAccount.query.filter_by(name=username).first()
+    def get(self, account):
+        db_user = UserAccount.query.filter_by(name=account).first()
         if db_user is None:
             return create_error_response(
                 404,
                 "Account doesn't exist"
             )
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
-        body = CryptoMonitorBuilder(timestamp=db_portfolio.timestamp,
-                                    value=db_portfolio.value)
+        body = CryptoMonitorBuilder(timestamp=db_portfolio.timestamp, value=db_portfolio.value)
+        
         body.add_namespace("crymo", "/cryptometa/link-relations#")
-        body.add_control("self", url_for("api.portfolioitem", id=db_portfolio.id))
-        body.add_control("up", url_for("api.accountitem", id=db_user.id))
+        body.add_control("self", href=url_for("api.portfolioitem", account=db_user.name))
+        body.add_control("up", href=url_for("api.accountitem", account=db_user.name))
         body.add_control_all_pcurrencies(db_user.id)
         body.add_control("profile", PORTFOLIO_PROFILE)
-        return Response(json.dumps(body), 200, mimetype=MASON)
+        return Response(resaponse=json.dumps(body), status=200, mimetype=MASON)

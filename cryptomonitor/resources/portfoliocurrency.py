@@ -8,13 +8,13 @@ from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
 
 class PortfolioCurrency(Resource):
-    def get(self,username, currencyname):
-        user = UserAccount.query.filter_by(name=username).first()
+    def get(self,account, pcurrency):
+        user = UserAccount.query.filter_by(name=account).first()
         # if user is None:
         #     return create_error_response(404, "User not found")
         port = Portfolio.query.filter_by(id=user.portfolio_id).first()
 
-        currency = CryptoCurrency.query.filter_by(abbreviation=currencyname).first()
+        currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency).first()
         # if currency is None:
         #     return create_error_response(404, "Currency not found in system")
         
@@ -29,19 +29,19 @@ class PortfolioCurrency(Resource):
             launchDate=currency.launchDate, blockchain_length=currency.blockhain_length, currencyAmount=pc.currencyAmount 
             )  
             body.add_namespace("crymo", LINK_RELATIONS_URL)
-            body.add_control("self", url_for("api.portfoliocurrency", username, currencyname))
+            body.add_control("self", url_for("api.portfoliocurrency", account, pcurrency))
             body.add_control("profile", PCURRENCY_PROFILE)
             body.add_control("collection", url_for("api.portfoliocurrencycollection"))
             body.add_control_get_currency_info(currency.abbreviation)
-            body.add_control_edit_pcurrency(username, currencyname)
-            body.add_control_delete_pcurrency(username, currencyname)
+            body.add_control_edit_pcurrency(account, pcurrency)
+            body.add_control_delete_pcurrency(account, pcurrency)
             return Response(json.dumps(body), 200, mimetype=MASON)
         else:
             return create_error_response(404, "Currency not found in portfolio")
 
 
 
-    def put(self, username):
+    def put(self, account):
 
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Request body must be json")
@@ -50,10 +50,10 @@ class PortfolioCurrency(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid json body")
         # Get the user's portfolio
-        db_user = UserAccount.query.filter_by(name=username).first()
+        db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         # Get the cryptocurrency
-        db_currency = CryptoCurrency.query.filter_by(abbrevation=request.json["currencyname"]).first()
+        db_currency = CryptoCurrency.query.filter_by(abbrevation=request.json["pcurrency"]).first()
 
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
@@ -68,15 +68,15 @@ class PortfolioCurrency(Resource):
             return create_error_response(404, "Currency not in portfolio")
         return Response(status=204)
 
-    def delete(self, username, currencyname):
+    def delete(self, account, pcurrency):
         """
         Remoove pcurrency from the user's portfolio 
         """
         # Get the user's portfolio
-        db_user = UserAccount.query.filter_by(name=username).first()
+        db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         # Get the cryptocurrency
-        db_currency = CryptoCurrency.query.filter_by(abbrevation=currencyname).first()
+        db_currency = CryptoCurrency.query.filter_by(abbrevation=pcurrency).first()
 
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
@@ -88,12 +88,12 @@ class PortfolioCurrency(Resource):
         return create_error_response(404, "Currency not found in user's portfolio")
 
 class PortfolioCurrencyCollection(Resource):
-    def get(self, username):
+    def get(self, account):
         """ 
         Get user's portfoliocurrency collection
         """
         # Get user
-        db_user = UserAccount.query.filter_by(name=username).first()
+        db_user = UserAccount.query.filter_by(name=account).first()
 
         if db_user is None:
             return create_error_response(404, "User not found")
@@ -106,10 +106,10 @@ class PortfolioCurrencyCollection(Resource):
             items = []
         )
         body.add_namespace("crymo", LINK_RELATIONS_URL)
-        base_uri = url_for("api.portfoliocurrencycollection", username=username)
-        body.add_control("up", url_for("api.portfolioitem", username=username))
+        base_uri = url_for("api.portfoliocurrencycollection", account=account)
+        body.add_control("up", url_for("api.portfolioitem", account=account))
         body.add_control("self", base_uri)
-        body.add_control_add_pcurrency(username)
+        body.add_control_add_pcurrency(account)
 
         for pc in db_pcurrencies:
             db_currency = CryptoCurrency.query.filter_by(id=pc.cryptocurrency_id).first()
@@ -121,7 +121,7 @@ class PortfolioCurrencyCollection(Resource):
         return Response(json.dumps(body), 200, mimetype=MASON)
 
 
-    def post(self, username):
+    def post(self, account):
         if not request.json:
             return create_error_response(415, "Unsupported media type")
         try:
@@ -129,9 +129,9 @@ class PortfolioCurrencyCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid json document", str(e))
 
-        db_user = UserAccount.query.filter_by(name=username).first()
+        db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
-        db_currency = CryptoCurrency.query.filter_by(name=request.json["currencyname"]).first()
+        db_currency = CryptoCurrency.query.filter_by(name=request.json["pcurrency"]).first()
         if db_currency is None:
             return create_error_response(404, "Currency not found") 
         pcurrency = crypto_portfolio(
@@ -147,7 +147,7 @@ class PortfolioCurrencyCollection(Resource):
             return create_error_response(409, "Already exists")
 
         return Response(status=201, headers={
-            "Location": url_for("api.portfoliocurrency", username=username, currencyname=request.json["currencyname"])
+            "Location": url_for("api.portfoliocurrency", account=account, currencyname=request.json["pcurrency"])
         })
 
         

@@ -16,13 +16,12 @@ class AccountCollection(Resource):
 
         body = CryptoMonitorBuilder(items = [])
         for single_account in UserAccount.query.all():
-            item =  CryptoMonitorBuilder(
-                id=single_account.id,
-                name=single_account.name,
-                portfolio_id=single_account.portfolio_id
+            item =  CryptoMonitorBuilder(                
+                account=single_account.name,
             )
             item.add_control("self", url_for("api.accountitem", account=single_account.name))
             item.add_control("profile", ACCOUNT_PROFILE)
+            item.add_control("portfolio", url_for("api.portfolioitem", account=single_account.name))
             body["items"].append(item)
 
 
@@ -61,18 +60,18 @@ class AccountCollection(Resource):
             "User account with name {} already exists".format(request.json["name"]))
 
         return Response(status=201, headers={
-                "Location": url_for("api.accountitem", useraccount=request.json["name"])
+                "Location": url_for("api.accountitem", account=request.json["name"])
         })
 
 
 class AccountItem(Resource):
 
-    def get(self, account_name):
-        single_account = UserAccount.query.filter_by(name=account_name).first()
+    def get(self, account):
+        single_account = UserAccount.query.filter_by(name=account).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by name: {}".format(account_name)
+                "Account not found by name: {}".format(account)
             )
 
         body = CryptoMonitorBuilder(
@@ -81,25 +80,26 @@ class AccountItem(Resource):
             portfolio_id=single_account.portfolio_id
         )
 
-        body.add_control("self", url_for("api.accountitem", account_name=account_name))
+        body.add_control("self", url_for("api.accountitem", account=account))
         body.add_control("profile", ACCOUNT_PROFILE) 
-        body.add_control("portfolio", url_for("api.portfolioitem"), id=single_account.portfolio_id)
+        body.add_control("portfolio", href=url_for("api.portfolioitem", account=single_account.name))
+        body.add_control("collection", href=url_for("api.accountcollection"))
         body.add_control_all_accounts()
-        body.add_control_edit_account(account_name=account_name)
-        body.add_control_delete_account(account_name=account_name)
+        body.add_control_edit_account(account=account)
+        body.add_control_delete_account(account=account)
         body.add_namespace("crymo", LINK_RELATIONS_URL)
 
         return Response(response=json.dumps(body), status=200, mimetype=MASON)
 
-    def put(self, account_name):
+    def put(self, account):
         """
         PUT method for editing account resource
         """
-        single_account = UserAccount.query.filter_by(name=account_name).first()
+        single_account = UserAccount.query.filter_by(name=account).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by name: {}".format(account_name)
+                "Account not found by name: {}".format(account)
             )
         if not request.json:
             return create_error_response(
@@ -133,12 +133,12 @@ class AccountItem(Resource):
         )
 
 
-    def delete(self, account_name):
-        single_account = UserAccount.query.filter_by(name=account_name).first()
+    def delete(self, account):
+        single_account = UserAccount.query.filter_by(name=account).first()
         if single_account is None:
             return create_error_response(
                 404, "Not found",
-                "Account not found by name {}".format(account_name)
+                "Account not found by name {}".format(account)
             )
         db.session.delete(single_account)
         db.session.commit()

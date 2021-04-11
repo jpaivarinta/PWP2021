@@ -4,6 +4,7 @@ import tempfile
 import os
 
 from sqlalchemy.engine import Engine
+from jsonschema import validate, ValidationError
 from sqlalchemy import event
 from cryptomonitor import create_app, db
 from datetime import datetime
@@ -140,7 +141,7 @@ class TestAccountCollection(object):
 		body = json.loads(resp.data)
 		_check_namespace(client, body)
 		_check_control_post_method_account("crymo:add-account", client, body)
-		assert len (body["items"] == 3)
+		assert len (body["items"]) == 3
 		for item in body["items"]:
 			_check_control_get_method("self", client, item)
 			_check_control_get_method("profile", client, item)
@@ -148,18 +149,22 @@ class TestAccountCollection(object):
 	def test_post(self, client):
 		pass
 
-"""
 class TestAccountItem(object):
+    """ 
+    Test accountitem resource
+    """
+    RESOURCE_URL = "/api/accounts/test-account-1/"
+    INVALID_URL = "/api/accounts/non-account-x/"
+    def test_get(self, client):
+        pass
 
-	def test_get(self, client):
-		pass
+    def test_put(self, client):
+       pass
 
-	def test_put(self, client):
-		pass
+    def test_delete(self, client):
+       pass
 
-	def test_delete(self, client):
-		pass
-
+"""
 class TestCryptoCurrencyCollection(object):
 
 	def test_get(self, client):
