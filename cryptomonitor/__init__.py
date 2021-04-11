@@ -27,8 +27,8 @@ def create_app(test_config=None):
 
 	db.init_app(app)
 
-	from . import models
-	from . import api
+	from cryptomonitor import models
+	from cryptomonitor import api
 
 	app.cli.add_command(models.init_db_command)
 	app.cli.add_command(models.generate_test_data)

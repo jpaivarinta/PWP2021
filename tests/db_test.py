@@ -2,9 +2,9 @@ import pytest
 from datetime import datetime
 import tempfile
 import os
-import app
-
-from database.cryptodb import db, UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
+import jsonschema
+from cryptomonitor import create_app, db
+from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
@@ -24,7 +24,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 def db_handle():
     db_fd, db_fname = tempfile.mkstemp()
 
-    test_app = app.app
+    test_app = create_app()
     test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
     test_app.config["TESTING"] = True
     db.init_app(test_app)
