@@ -1,4 +1,8 @@
 import pytest
+import json
+import tempfile
+import os
+
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from cryptomonitor import create_app, db
@@ -13,7 +17,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 @pytest.fixture
-def app():
+def client():
     db_fd, db_fname = tempfile.mkstemp()
     config = {
         "SQLALCHEMY_DATABASE_URI": "sqlite:///" + db_fname,
@@ -52,7 +56,7 @@ def _get_pcurrency_json(name, amount):
 def _get_account_json(name, password):
     return {"name": "{}".format(name), "password": "{}".format(password)}
 
-def check_namespace(client, response):
+def _check_namespace(client, response):
     ns_href = response["@namespaces"]["crymo"]["name"]
     resp = client.get(ns_href)
     assert resp.status_code == 200
@@ -122,3 +126,71 @@ def _check_control_post_method_account(ctrl, client, obj):
     validate(body, schema)
     resp = client.post(href, json=body)
     assert resp.status_code == 201
+
+
+class TestAccountCollection(object):
+	""" 
+	Tests of AccountCollection resource.
+	""" 
+	RESOURCE_URL = "/api/accounts/"
+
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		_check_control_post_method_account("crymo:add-account", client, body)
+		assert len (body["items"] == 3)
+		for item in body["items"]:
+			_check_control_get_method("self", client, item)
+			_check_control_get_method("profile", client, item)
+	
+	def test_post(self, client):
+		pass
+
+"""
+class TestAccountItem(object):
+
+	def test_get(self, client):
+		pass
+
+	def test_put(self, client):
+		pass
+
+	def test_delete(self, client):
+		pass
+
+class TestCryptoCurrencyCollection(object):
+
+	def test_get(self, client):
+		pass
+
+class TestCryptoCurrencyItem(object):
+
+	def test_get(self, client):
+		pass
+
+class TestPortfolioItem(object):
+
+	def test_get(self, client):
+		pass
+
+class TestPortfolioCurrencyCollection(object):
+
+	def test_get(self, client):
+		pass
+
+	def test_post(self, client):
+		pass
+
+class TestPortfolioCurrency(object):
+
+	def test_get(self, client):
+		pass
+
+	def test_put(self, client):
+		pass
+
+	def test_delete(self, client):
+		pass
+"""
