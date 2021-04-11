@@ -147,7 +147,28 @@ class TestAccountCollection(object):
 			_check_control_get_method("profile", client, item)
 	
 	def test_post(self, client):
-		pass
+		valid = _get_account_json("juu", 12.5)
+
+		#test with wrong content type
+		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
+		assert resp.status_code == 415
+
+		#Test with valid and see if exists afterwards
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 201
+
+		# assert resp.headers["Location"].endswith(self.RESOURCE_URL + valid["id"] + "/")
+		resp = client.get(resp.headers["Location"])
+		assert resp.status_code == 200
+
+		# send same data again for 409
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 409
+
+		# remove model field for 400
+		valid.pop("name")
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 400
 
 class TestAccountItem(object):
     """ 

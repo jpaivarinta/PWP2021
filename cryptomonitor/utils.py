@@ -1,5 +1,6 @@
 import json
 from flask import Response, request, url_for
+from cryptomonitor.constants import *
 from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency
 
 class MasonBuilder(dict):
