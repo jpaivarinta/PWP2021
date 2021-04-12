@@ -143,4 +143,4 @@ class AccountItem(Resource):
         db.session.delete(single_account)
         db.session.commit()
 
-        return Response(204, mimetype=MASON)
+        return Response(status=204, mimetype=MASON)
