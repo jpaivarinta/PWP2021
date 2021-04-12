@@ -83,7 +83,7 @@ class AccountItem(Resource):
         body.add_control("self", url_for("api.accountitem", account=account))
         body.add_control("profile", ACCOUNT_PROFILE) 
         body.add_control("portfolio", href=url_for("api.portfolioitem", account=single_account.name))
-        body.add_control("collection", href=url_for("api.accountcollection"))
+        #body.add_control("collection", href=url_for("api.accountcollection"))
         body.add_control_all_accounts()
         body.add_control_edit_account(account=account)
         body.add_control_delete_account(account=account)

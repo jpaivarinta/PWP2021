@@ -127,7 +127,6 @@ class CryptoMonitorBuilder(MasonBuilder):
     def add_control_edit_account(self, account):
         """
         Adds control for editing an account in the response body.
-        : param int account id: The ID of the editable account.
         """
         self.add_control(
             "edit",
@@ -141,7 +140,6 @@ class CryptoMonitorBuilder(MasonBuilder):
     def add_control_delete_account(self, account):
         """
         Adds control for deleting an account in the response body.
-        : param int account_id: The is of the deletable account.
         """
         self.add_control(
             "crymo:delete",

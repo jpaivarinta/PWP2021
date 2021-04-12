@@ -128,6 +128,21 @@ def _check_control_post_method_account(ctrl, client, obj):
     resp = client.post(href, json=body)
     assert resp.status_code == 201
 
+def _check_control_put_method_account(ctrl, client, obj):
+
+	ctrl_obj = obj["@controls"][ctrl]
+	href = ctrl_obj["href"]
+	method = ctrl_obj["method"].lower()
+	encoding = ctrl_obj["encoding"].lower()
+	schema = ctrl_obj["schema"]
+	assert method == "put"
+	assert encoding == "json"
+	body = _get_account_json("joo", 12.5)
+	body["name"] = obj["name"]
+	validate(body, schema)
+	resp = client.put(href, json=body)
+	assert resp.status_code == 204
+
 
 class TestAccountCollection(object):
 	""" 
@@ -176,16 +191,32 @@ class TestAccountItem(object):
     """
     RESOURCE_URL = "/api/accounts/test-account-1/"
     INVALID_URL = "/api/accounts/non-account-x/"
+
     def test_get(self, client):
-        pass
+
+        resp = client.get(self.RESOURCE_URL)
+        body = json.loads(resp.data)
+        print(body)
+        _check_namespace(client, body)
+        _check_control_get_method("profile", client, body)
+        _check_control_get_method("crymo:accounts-all", client, body)
+        _check_control_put_method_account("edit", client, body)
+        _check_control_delete_method("crymo:delete", client, body)
 
     def test_put(self, client):
        pass
 
     def test_delete(self, client):
-       pass
+       """
+       Testing DELETE method of the AccountItem resource
+       for different status codes.
+
+       resp = client.delete(self.RESOURCE_URL)
+       assert resp.status_code == 204
+       """
 
 """
+
 class TestCryptoCurrencyCollection(object):
 
 	def test_get(self, client):
