@@ -121,7 +121,7 @@ class AccountItem(Resource):
         try:
             db.session.commit()
         except IntegrityError:
-            deb.session.rollback()
+            db.session.rollback()
             return create_error_response(
                 409, "Already exists",
                 "Account with given name already exists"
