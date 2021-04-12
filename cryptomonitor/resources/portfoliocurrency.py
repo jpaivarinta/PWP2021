@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from cryptomonitor.models import UserAccount, crypto_portfolio, Portfolio, CryptoCurrency
 from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
+from cryptomonitor import db
 
 class PortfolioCurrency(Resource):
     def get(self,account, pcurrency):
@@ -53,7 +54,7 @@ class PortfolioCurrency(Resource):
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         # Get the cryptocurrency
-        db_currency = CryptoCurrency.query.filter_by(abbrevation=request.json["pcurrency"]).first()
+        db_currency = CryptoCurrency.query.filter_by(abbrevation=request.json["currencyname"]).first()
 
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
@@ -117,8 +118,10 @@ class PortfolioCurrencyCollection(Resource):
                 currencyamount=pc.currencyAmount,
                 currencyname=db_currency.abbreviation
             ) 
-            body['items'].append(pc)
-        return Response(json.dumps(body), 200, mimetype=MASON)
+            body.add_control("self", url_for("api.portfoliocurrency", account=account, pcurrency=db_currency.abbreviation))
+            body.add_control("profile", PCURRENCY_PROFILE)
+            body['items'].append(item)
+        return Response(json.dumps(body), status=200, mimetype=MASON)
 
 
     def post(self, account):
@@ -131,13 +134,13 @@ class PortfolioCurrencyCollection(Resource):
 
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
-        db_currency = CryptoCurrency.query.filter_by(name=request.json["pcurrency"]).first()
+        db_currency = CryptoCurrency.query.filter_by(abbreviation=request.json["currencyname"]).first()
         if db_currency is None:
             return create_error_response(404, "Currency not found") 
         pcurrency = crypto_portfolio(
             portfolio=db_portfolio, 
             cryptocurrency=db_currency, 
-            currencyAmount=request.json["currencyAmount"]
+            currencyAmount=request.json["currencyamount"]
         )
 
         try:
@@ -147,7 +150,7 @@ class PortfolioCurrencyCollection(Resource):
             return create_error_response(409, "Already exists")
 
         return Response(status=201, headers={
-            "Location": url_for("api.portfoliocurrency", account=account, currencyname=request.json["pcurrency"])
+            "Location": url_for("api.portfoliocurrency", account=account, pcurrency=request.json["currencyname"])
         })
 
         

@@ -1,7 +1,7 @@
 import json
 from flask import Response, request, url_for
 from cryptomonitor.constants import *
-from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency
+from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
 class MasonBuilder(dict):
     """
@@ -172,7 +172,8 @@ class CryptoMonitorBuilder(MasonBuilder):
             href= url_for("api.portfoliocurrencycollection", account=account),
             method="POST",
             encoding="JSON",
-            title="Add currency to account's portfolio"
+            title="Add currency to account's portfolio",
+            schema=crypto_portfolio.get_schema()
         )
 
     def add_control_delete_pcurrency(self, account, pcurrency):
@@ -195,7 +196,8 @@ class CryptoMonitorBuilder(MasonBuilder):
             href=url_for("api.portfoliocurrency",account=account, pcurrency=pcurrency),
             method="PUT",
             encoding="JSON",
-            title="Edit pcurrency in portfolio"
+            title="Edit pcurrency in portfolio",
+            schema=crypto_portfolio.get_schema()
         )
 
     """ CRYPTOCURRENCY controls """

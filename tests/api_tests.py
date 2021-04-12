@@ -38,6 +38,13 @@ def client():
     os.unlink(db_fname)
 
 def _populate_db():
+    cc = _get_CryptoCurrency()
+    cc2 = _get_CryptoCurrency2()
+    cc3 = _get_CryptoCurrency3()
+    db.session.add(cc)
+    db.session.add(cc2)
+    db.session.add(cc3)
+
     for i in range(1, 4):
         a = UserAccount(
             name = "test-account-{}".format(i),
@@ -48,6 +55,12 @@ def _populate_db():
             value = float(i * 100)
         )
         a.portfolio = p
+        cp = crypto_portfolio(portfolio=p, cryptocurrency=cc, currencyAmount=500.0)
+        cp2 = crypto_portfolio(portfolio=p, cryptocurrency=cc2, currencyAmount=47666.0)
+        p.cryptocurrencies.append(cp)
+        p.cryptocurrencies.append(cp2)
+        db.session.add(cp)
+        db.session.add(cp2)
         db.session.add(a)
         db.session.add(p)
     db.session.commit()
@@ -58,6 +71,38 @@ def _get_pcurrency_json(name, amount):
 def _get_account_json(name, password):
     return {"name": "{}".format(name), "password": "{}".format(password)}
 
+def _get_CryptoCurrency():
+	return CryptoCurrency(
+	    name="DogeCoin",
+	    abbreviation="DOGE",
+	    timestamp=datetime.now(),
+	    value=0.0462,
+	    daily_growth=7.1,
+	    launchDate=datetime(2012,5,12),
+	    blockchain_length=3610463
+	)
+
+def _get_CryptoCurrency2():
+	return CryptoCurrency(
+	    name="Bitcoin",
+	    abbreviation="BTC",
+	    timestamp=datetime.now(),
+	    value=50000.00,
+	    daily_growth=7.1,
+	    launchDate=datetime(2012,5,12),
+	    blockchain_length=3610463
+	)
+
+def _get_CryptoCurrency3():
+	return CryptoCurrency(
+	    name="Litecoin",
+	    abbreviation="LTC",
+	    timestamp=datetime.now(),
+	    value=10000.00,
+	    daily_growth=2.1,
+	    launchDate=datetime(1500,5,12),
+	    blockchain_length=3610463
+	)
 
 # GENERAL CONTROL CHECKS
 
@@ -135,7 +180,9 @@ def _check_control_post_method_pcurrency(ctrl, client, obj):
     assert encoding == "json"
     body = _get_pcurrency_json("LTC", "200.0")
     validate(body, schema)
+    print(href)
     resp = client.post(href, json=body)
+    print(obj)
     assert resp.status_code == 201
 
 
@@ -244,23 +291,35 @@ class TestPortfolioItem(object):
 
 	def test_get(self, client):
 		pass
+"""
 
 class TestPortfolioCurrencyCollection(object):
+    """ 
+    Test portfoliocurrencycollection
+    """ 
+    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
-	def test_get(self, client):
-		pass
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+        _check_control_post_method_pcurrency("crymo:add-pcurrency", client, body)
+        assert len (body["items"]) == 2
+        for item in body["items"]:
+            _check_control_get_method("self", client, item)
+            _check_control_get_method("profile", client, item)
 
-	def test_post(self, client):
-		pass
+    def test_post(self, client):
+        pass
 
 class TestPortfolioCurrency(object):
 
-	def test_get(self, client):
-		pass
+    def test_get(self, client):
+        pass
 
-	def test_put(self, client):
-		pass
+    def test_put(self, client):
+        pass
 
-	def test_delete(self, client):
-		pass
-"""
+    def test_delete(self, client):
+        pass
