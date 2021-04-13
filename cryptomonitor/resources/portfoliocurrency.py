@@ -11,14 +11,14 @@ from cryptomonitor import db
 class PortfolioCurrency(Resource):
     def get(self,account, pcurrency):
         user = UserAccount.query.filter_by(name=account).first()
-        # if user is None:
-        #     return create_error_response(404, "User not found")
+        if user is None:
+            return create_error_response(404, "User not found")
         port = Portfolio.query.filter_by(id=user.portfolio_id).first()
 
         currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency).first()
         
-        # if currency is None:
-        #     return create_error_response(404, "Currency not found in system")
+        if currency is None:
+            return create_error_response(404, "Currency not found in system")
         
         pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=port.id).all()
         for pc in pcurrencies:
