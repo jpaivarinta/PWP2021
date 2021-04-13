@@ -207,7 +207,7 @@ class TestAccountCollection(object):
 	
 	def test_post(self, client):
 		valid = _get_account_json("juu", "testpwd")
-		print(valid)
+		#print(valid)
 
 		#test with wrong content type
 		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
@@ -289,16 +289,29 @@ class TestCryptoCurrencyCollection(object):
         assert resp.status_code == 200
         body = json.loads(resp.data)
         _check_namespace(client, body)
+        for control in body["@controls"]:
+            _check_control_get_method(control, client, body)
+
         for item in body["items"]:
             _check_control_get_method("self", client, item)
             _check_control_get_method("profile", client, item)
 
-""" I don't think this is necessary, because it is already tested in TestCryptoCurrencyCollection in the for loop.
 class TestCryptoCurrencyItem(object):
+    """ Test for CryptoCurrencyItem resource. """
 
-	def test_get(self, client):
-		pass
-"""
+    RESOURCE_URL = "/api/currencies/DOGE/"
+    INVALID_URL = "/api/currencies/DOGGO/"
+
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+        for control in body["@controls"]:
+            _check_control_get_method(control, client, body)
+        
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
 
 class TestPortfolioItem(object):
     """ 
@@ -306,18 +319,24 @@ class TestPortfolioItem(object):
     """ 
 
     RESOURCE_URL = "/api/accounts/test-account-1/portfolio/"
+    INVALID_URL = "/api/accounts/jorma/portfolio/"
 
     def test_get(self, client):
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
         _check_namespace(client, body)
+        for control in body["@controls"]:
+            _check_control_get_method(control, client, body)
+
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
 
 
 class TestPortfolioCurrencyCollection(object):
-    """
-    Test portfoliocurrencycollection
-    """
+    
+    """ Test portfoliocurrencycollection """
+    
     RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
     def test_get(self, client):

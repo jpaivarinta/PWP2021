@@ -33,7 +33,7 @@ class CryptoCurrencyCollection(Resource):
         body = CryptoMonitorBuilder(items=[])
 
         body.add_namespace("crymo", LINK_RELATIONS_URL)
-        body.add_control("self", "/currencies/")
+        body.add_control("self", "/api/currencies/")
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
 
