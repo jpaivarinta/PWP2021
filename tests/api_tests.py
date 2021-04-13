@@ -203,9 +203,11 @@ class TestAccountCollection(object):
 		for item in body["items"]:
 			_check_control_get_method("self", client, item)
 			_check_control_get_method("profile", client, item)
+			_check_control_get_method("portfolio", client, item)
 	
 	def test_post(self, client):
-		valid = _get_account_json("juu", 12.5)
+		valid = _get_account_json("juu", "testpwd")
+		print(valid)
 
 		#test with wrong content type
 		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
@@ -239,7 +241,7 @@ class TestAccountItem(object):
     	_check_control_get_method("profile", client, body)
     	_check_control_get_method("crymo:accounts-all", client, body)
     	_check_control_put_method_account("edit", client, body)
-    	_check_control_delete_method("crymo:delete", client, body)					#FAILS, CHECK THIS OUT
+    	_check_control_delete_method("crymo:delete", client, body)
     	resp = client.get(self.INVALID_URL)
     	assert resp.status_code == 404
 
@@ -267,7 +269,7 @@ class TestAccountItem(object):
     	assert resp.status_code == 400
 
     def test_delete(self, client):
-       """ Tests for DELETE method of AccountItem resource. """ #ALL DELETE-tests failing, CHECK THIS OUT
+       """ Tests for DELETE method of AccountItem resource. """
        resp = client.delete(self.RESOURCE_URL)
        assert resp.status_code == 204
        resp = client.delete(self.RESOURCE_URL)
@@ -278,9 +280,7 @@ class TestAccountItem(object):
 
 
 class TestCryptoCurrencyCollection(object):
-    """ 
-    Test cryptocurrencycollection
-    """ 
+    """ Test for CryptoCurrencyCollection resource. """ 
 
     RESOURCE_URL = "/api/currencies/"
 
@@ -338,12 +338,22 @@ class TestPortfolioCurrencyCollection(object):
 
 
 class TestPortfolioCurrency(object):
+	""" Tests for PortfolioCurrency resource. """
+	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/doge/"
+	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
-    def test_get(self, client):
-        pass
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		_check_control_get_method("profile", client, body)
+		_check_control_get_method("collection", client, body)
+		_check_control_get_method("crymo:currency-info", client, body)
+		_check_control_delete_method("crymo:delete", client, body)
 
-    def test_put(self, client):
-        pass
 
-    def test_delete(self, client):
-        pass
+	def test_put(self, client):
+		pass
+	def test_delete(self, client):
+		pass
