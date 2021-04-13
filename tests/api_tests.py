@@ -358,7 +358,7 @@ class TestPortfolioCurrencyCollection(object):
 
 class TestPortfolioCurrency(object):
 	""" Tests for PortfolioCurrency resource. """
-	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/doge/"
+	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
 	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
 	def test_get(self, client):
