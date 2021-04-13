@@ -21,6 +21,6 @@ class PortfolioItem(Resource):
         body.add_namespace("crymo", LINK_RELATIONS_URL)
         body.add_control("self", href=url_for("api.portfolioitem", account=db_user.name))
         body.add_control("up", href=url_for("api.accountitem", account=db_user.name))
-        body.add_control_all_pcurrencies(db_user.id)
+        body.add_control_all_pcurrencies(db_user.name)
         body.add_control("profile", PORTFOLIO_PROFILE)
         return Response(response=json.dumps(body, default=str), status=200, mimetype=MASON)
