@@ -9,7 +9,7 @@ from cryptomonitor.constants import *
 from cryptomonitor import db
 
 class PortfolioCurrency(Resource):
-    def get(self,account, pcurrency):
+    def get(self, account, pcurrency):
         user = UserAccount.query.filter_by(name=account).first()
         if user is None:
             return create_error_response(404, "User not found")
@@ -35,7 +35,7 @@ class PortfolioCurrency(Resource):
             body.add_control("profile", PCURRENCY_PROFILE)
             body.add_control("collection", url_for("api.portfoliocurrencycollection", account=account))
             body.add_control_get_currency_info(currency.abbreviation)
-            body.add_control_edit_pcurrency(account, pcurrency)
+            body.add_control_edit_pcurrency(account=account, pcurrency=pcurrency)
             body.add_control_delete_pcurrency(account, currency.abbreviation)
             return Response(json.dumps(body), 200, mimetype=MASON)
         else:
@@ -43,7 +43,7 @@ class PortfolioCurrency(Resource):
 
 
 
-    def put(self, account):
+    def put(self, account, pcurrency):
 
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Request body must be json")

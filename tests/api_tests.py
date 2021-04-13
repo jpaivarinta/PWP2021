@@ -246,7 +246,7 @@ class TestAccountItem(object):
     	assert resp.status_code == 404
 
     def test_put(self, client):
-    	""" Tests for GET method of AccountItem resource. """
+    	""" Tests for PUT method of AccountItem resource. """
     	valid = _get_account_json("pekka", "testpwd")
 
     	#Test with wrong content type
@@ -346,9 +346,7 @@ class TestPortfolioCurrencyCollection(object):
         _check_namespace(client, body)
         _check_control_post_method_pcurrency("crymo:add-pcurrency", client, body)
         assert len (body["items"]) == 2
-        # print(body)
         for item in body["items"]:
-            print(item)
             _check_control_get_method("self", client, item)
             _check_control_get_method("profile", client, item)
 
@@ -370,9 +368,37 @@ class TestPortfolioCurrency(object):
 		_check_control_get_method("collection", client, body)
 		_check_control_get_method("crymo:currency-info", client, body)
 		_check_control_delete_method("crymo:delete", client, body)
-
+		resp = client.get(self.INVALID_URL)
+		assert resp.status_code == 404
 
 	def test_put(self, client):
-		pass
+		""" Tests for PUT method of PortfolioCurrency resource. """
+		valid = _get_pcurrency_json("LTC", "200.0")
+		print(valid)
+
+		#Test with wrong content type
+		resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+		assert resp.status_code == 415
+
+
+		#ADD TEST FOR STATUS CODE 404!!
+
+
+
+
+
+
+
+		# test with valid currencyname
+		valid["currencyname"] = "DOGE"
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 204
+
+		#Test for invalid json 400
+		valid.pop("currencyname")
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		print(resp)
+		assert resp.status_code == 400
+
 	def test_delete(self, client):
 		pass
