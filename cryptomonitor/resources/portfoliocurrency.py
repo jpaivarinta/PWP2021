@@ -26,13 +26,13 @@ class PortfolioCurrency(Resource):
                 break
         if pcurrency:
             body = CryptoMonitorBuilder(id=currency.id, name=currency.name, abbreviation=currency.abbreviation,
-            timestamp=currency.timestamp, value=currency.value, daily_growth=currency.daily_growth,
-            launchDate=currency.launchDate, blockchain_length=currency.blockhain_length, currencyAmount=pc.currencyAmount 
+            timestamp=currency.timestamp.isoformat(), value=currency.value, daily_growth=currency.daily_growth,
+            launchDate=currency.launchDate.isoformat(), blockchain_length=currency.blockchain_length, currencyAmount=pc.currencyAmount 
             )  
             body.add_namespace("crymo", LINK_RELATIONS_URL)
-            body.add_control("self", url_for("api.portfoliocurrency", account, pcurrency))
+            body.add_control("self", url_for("api.portfoliocurrency", account=account, pcurrency=pcurrency))
             body.add_control("profile", PCURRENCY_PROFILE)
-            body.add_control("collection", url_for("api.portfoliocurrencycollection"))
+            body.add_control("collection", url_for("api.portfoliocurrencycollection", account=account))
             body.add_control_get_currency_info(currency.abbreviation)
             body.add_control_edit_pcurrency(account, pcurrency)
             body.add_control_delete_pcurrency(account, pcurrency)
@@ -118,8 +118,8 @@ class PortfolioCurrencyCollection(Resource):
                 currencyamount=pc.currencyAmount,
                 currencyname=db_currency.abbreviation
             ) 
-            body.add_control("self", url_for("api.portfoliocurrency", account=account, pcurrency=db_currency.abbreviation))
-            body.add_control("profile", PCURRENCY_PROFILE)
+            item.add_control("self", url_for("api.portfoliocurrency", account=account, pcurrency=db_currency.abbreviation))
+            item.add_control("profile", PCURRENCY_PROFILE)
             body['items'].append(item)
         return Response(json.dumps(body), status=200, mimetype=MASON)
 

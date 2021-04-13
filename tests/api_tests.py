@@ -180,9 +180,9 @@ def _check_control_post_method_pcurrency(ctrl, client, obj):
     assert encoding == "json"
     body = _get_pcurrency_json("LTC", "200.0")
     validate(body, schema)
-    print(href)
+    # print(href)
     resp = client.post(href, json=body)
-    print(obj)
+    # print(obj)
     assert resp.status_code == 201
 
 
@@ -327,7 +327,9 @@ class TestPortfolioCurrencyCollection(object):
         _check_namespace(client, body)
         _check_control_post_method_pcurrency("crymo:add-pcurrency", client, body)
         assert len (body["items"]) == 2
+        # print(body)
         for item in body["items"]:
+            print(item)
             _check_control_get_method("self", client, item)
             _check_control_get_method("profile", client, item)
 

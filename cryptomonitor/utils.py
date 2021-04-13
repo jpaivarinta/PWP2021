@@ -182,7 +182,7 @@ class CryptoMonitorBuilder(MasonBuilder):
         """
         self.add_control(
             "crymo:delete",
-            href=api.url_for("api.portfoliocurrency", account=account, pcurrency=pcurrency),
+            href=url_for("api.portfoliocurrency", account=account, pcurrency=pcurrency),
             method="DELETE",
             title="Delete cryptocurrency from the account's portfolio."
         )
