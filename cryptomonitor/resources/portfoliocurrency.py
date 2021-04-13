@@ -16,6 +16,7 @@ class PortfolioCurrency(Resource):
         port = Portfolio.query.filter_by(id=user.portfolio_id).first()
 
         currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency).first()
+        
         # if currency is None:
         #     return create_error_response(404, "Currency not found in system")
         
@@ -35,7 +36,7 @@ class PortfolioCurrency(Resource):
             body.add_control("collection", url_for("api.portfoliocurrencycollection", account=account))
             body.add_control_get_currency_info(currency.abbreviation)
             body.add_control_edit_pcurrency(account, pcurrency)
-            body.add_control_delete_pcurrency(account, pcurrency)
+            body.add_control_delete_pcurrency(account, currency.abbreviation)
             return Response(json.dumps(body), 200, mimetype=MASON)
         else:
             return create_error_response(404, "Currency not found in portfolio")
@@ -78,7 +79,7 @@ class PortfolioCurrency(Resource):
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         # Get the cryptocurrency
         db_currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency).first()
-        print(pcurrency)
+        
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
         for pc in db_pcurrencies:
