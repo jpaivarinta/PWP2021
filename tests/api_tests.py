@@ -276,27 +276,48 @@ class TestAccountItem(object):
        assert resp.status_code == 404
 
 
-"""
+
 class TestCryptoCurrencyCollection(object):
+    """ 
+    Test cryptocurrencycollection
+    """ 
 
-	def test_get(self, client):
-		pass
+    RESOURCE_URL = "/api/currencies/"
 
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+        for item in body["items"]:
+            _check_control_get_method("self", client, item)
+            _check_control_get_method("profile", client, item)
+
+""" I don't think this is necessary, because it is already tested in TestCryptoCurrencyCollection in the for loop.
 class TestCryptoCurrencyItem(object):
 
 	def test_get(self, client):
 		pass
-
-class TestPortfolioItem(object):
-
-	def test_get(self, client):
-		pass
 """
 
+class TestPortfolioItem(object):
+    """ 
+    Test cryptocurrencycollection
+    """ 
+
+    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/"
+
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+
+
 class TestPortfolioCurrencyCollection(object):
-    """ 
+    """
     Test portfoliocurrencycollection
-    """ 
+    """
     RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
     def test_get(self, client):
@@ -312,6 +333,7 @@ class TestPortfolioCurrencyCollection(object):
 
     def test_post(self, client):
         pass
+
 
 class TestPortfolioCurrency(object):
 

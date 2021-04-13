@@ -8,31 +8,31 @@ from cryptomonitor.constants import *
 
 
 class CryptoCurrencyItem(Resource):
-    def get(self, name):
-        currency = CryptoCurrency.query.filter_by(name=name).first()
-        if currency is None:
+    def get(self, currency):
+        currencyitem = CryptoCurrency.query.filter_by(abbreviation=currency).first()
+        if currencyitem is None:
             return create_error_response(404, "Currency not in database")
 
         body = CryptoMonitorBuilder(
-            name=currency.name,
-            abbreviation=currency.abbreviation,
-            timestamp=currency.timestamp,
-            value=currency.value,
-            daily_growth=currency.daily_growth
+            name=currencyitem.name,
+            abbreviation=currencyitem.abbreviation,
+            timestamp=currencyitem.timestamp,
+            value=currencyitem.value,
+            daily_growth=currencyitem.daily_growth
         )
 
-        body.add_namespace("crymo", "/cryptometa/link-relations#")
-        body.add_control("self", url_for("api.cryptocurrencyitem", currency=currency.abbreviation))
+        body.add_namespace("crymo", LINK_RELATIONS_URL)
+        body.add_control("self", url_for("api.cryptocurrencyitem", currency=currencyitem.abbreviation))
         body.add_control_all_currencies()
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
-        return Response(json.dumps(body), 200, mimetype=MASON)
+        return Response(json.dumps(body, default=str), 200, mimetype=MASON)
 
 class CryptoCurrencyCollection(Resource):
     def get(self):
         body = CryptoMonitorBuilder(items=[])
 
-        body.add_namespace("crymo", "/cryptometa/link-relations#")
+        body.add_namespace("crymo", LINK_RELATIONS_URL)
         body.add_control("self", "/currencies/")
         body.add_control_all_accounts()
         body.add_control("profile", CCURRENCY_PROFILE)
@@ -48,4 +48,4 @@ class CryptoCurrencyCollection(Resource):
             item.add_control("self", url_for("api.cryptocurrencyitem", currency=currency.abbreviation ))
             item.add_control("profile", CCURRENCY_PROFILE)
             body["items"].append(item)
-        return Response(json.dumps(body), 200, mimetype=MASON)
+        return Response(json.dumps(body, default=str), 200, mimetype=MASON)
