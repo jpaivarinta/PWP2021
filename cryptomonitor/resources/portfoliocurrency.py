@@ -55,7 +55,7 @@ class PortfolioCurrency(Resource):
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
         # Get the cryptocurrency
-        db_currency = CryptoCurrency.query.filter_by(abbreviation=request.json["currencyname"]).first()
+        db_currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency.upper()).first()
 
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()

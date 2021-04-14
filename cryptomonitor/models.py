@@ -25,11 +25,7 @@ class crypto_portfolio(db.Model):
             "type": "object",
             "required": ["currencyname", "currencyamount"]
         }
-        props = schema["properties"] = {}
-        props["currencyname"] = {
-            "description": "Abbreviation of currency",
-            "type": "string"
-        }
+        props = schema["properties"] = {}        
         props["currencyamount"] = {
             "description": "Amount of currency",
             "type": "string"
