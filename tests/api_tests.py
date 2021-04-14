@@ -104,96 +104,143 @@ def _get_CryptoCurrency3():
 	    blockchain_length=3610463
 	)
 
+
 # GENERAL CONTROL CHECKS
 
 def _check_namespace(client, response):
-    ns_href = response["@namespaces"]["crymo"]["name"]
-    resp = client.get(ns_href)
-    assert resp.status_code == 200
+	"""
+	Checks that the "crymo" namespace is found from the response body, and
+	that its "name" attribute is a URL that can be accessed.
+	"""
+	ns_href = response["@namespaces"]["crymo"]["name"]
+	resp = client.get(ns_href)
+	assert resp.status_code == 200
 
 def _check_control_get_method(ctrl, client, obj):
-    href = obj["@controls"][ctrl]["href"]
-    resp = client.get(href)
-    assert resp.status_code == 200
+	"""
+	Checks a GET type control from a JSON object be it root document or an item
+	in a collection. Also checks that the URL of the control can be accessed.
+	"""
+	href = obj["@controls"][ctrl]["href"]
+	resp = client.get(href)
+	assert resp.status_code == 200
 
 def _check_control_delete_method(ctrl, client, obj):
-    href = obj["@controls"][ctrl]["href"]
-    method = obj["@controls"][ctrl]["method"].lower()
-    assert method == "delete"
-    resp = client.delete(href)
-    assert resp.status_code == 204
+	"""
+	Checks a DELETE type control from a JSON object be it root document or an
+	item in a collection. Checks the contrl's method in addition to its "href".
+	Also checks that using the control results in the correct status code of 204.
+	"""
+
+	href = obj["@controls"][ctrl]["href"]
+	method = obj["@controls"][ctrl]["method"].lower()
+	assert method == "delete"
+	resp = client.delete(href)
+	assert resp.status_code == 204
 
 
 # ACCOUNT CONTROL CHECKS
 
 def _check_control_put_method_account(ctrl, client, obj):
-    ctrl_obj = obj["@controls"][ctrl]
-    href = ctrl_obj["href"]
-    method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
-    schema = ctrl_obj["schema"]
-    assert method == "put"
-    assert encoding == "json"
-    body = _get_account_json("pekka", "testpwd")
-    body["name"] = obj["name"]
-    validate(body, schema)
-    resp = client.put(href, json=body)
-    assert resp.status_code == 204
+	"""
+	Checks a PUT type control from a JSON object be it root document or an item
+	in a collection. In addition to checking the "href" attribute, also checks
+	that method, encoding and schema can be found from the control. Also
+	validates a valid game against the schema of the control to ensure that
+	they match. Finally checks that using the control results in the correct
+	status code of 204.
+	"""
+
+	ctrl_obj = obj["@controls"][ctrl]
+	href = ctrl_obj["href"]
+	method = ctrl_obj["method"].lower()
+	encoding = ctrl_obj["encoding"].lower()
+	schema = ctrl_obj["schema"]
+	assert method == "put"
+	assert encoding == "json"
+	body = _get_account_json("pekka", "testpwd")
+	body["name"] = obj["name"]
+	validate(body, schema)
+	resp = client.put(href, json=body)
+	assert resp.status_code == 204
 
 def _check_control_post_method_account(ctrl, client, obj):
-    ctrl_obj = obj["@controls"][ctrl]
-    href = ctrl_obj["href"]
-    method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
-    schema = ctrl_obj["schema"]
-    assert method == "post"
-    assert encoding == "json"
-    body = _get_account_json("pekka", "testpwd")
-    validate(body, schema)
-    resp = client.post(href, json=body)
-    assert resp.status_code == 201
+	"""
+	Checks a POST type control from a JSON object be it root document or an item
+	in a collection. In addition to checking the "href" attribute, also checks
+	that method, encoding and schema can be found from the control. Also
+	validates a valid sensor against the schema of the control to ensure that
+	they match. Finally checks that using the control results in the correct
+	status code of 201.
+	"""
+
+	ctrl_obj = obj["@controls"][ctrl]
+	href = ctrl_obj["href"]
+	method = ctrl_obj["method"].lower()
+	encoding = ctrl_obj["encoding"].lower()
+	schema = ctrl_obj["schema"]
+	assert method == "post"
+	assert encoding == "json"
+	body = _get_account_json("pekka", "testpwd")
+	validate(body, schema)
+	resp = client.post(href, json=body)
+	assert resp.status_code == 201
 
 
 # PCURRENCY CONTROL CHECKS
 
 def _check_control_put_method_pcurrency(ctrl, client, obj):
-    ctrl_obj = obj["@controls"][ctrl]
-    href = ctrl_obj["href"]
-    method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
-    schema = ctrl_obj["schema"]
-    assert method == "put"
-    assert encoding == "json"
-    body = _get_pcurrency_json("LTC", "200.0")
-    body["currencyname"] = obj["currencyname"]
-    validate(body, schema)
-    resp = client.put(href, json=body)
-    assert resp.status_code == 204
+	"""
+	Checks a PUT type control from a JSON object be it root document or an item
+	in a collection. In addition to checking the "href" attribute, also checks
+	that method, encoding and schema can be found from the control. Also
+	validates a valid game against the schema of the control to ensure that
+	they match. Finally checks that using the control results in the correct
+	status code of 204.
+	"""
+
+	ctrl_obj = obj["@controls"][ctrl]
+	href = ctrl_obj["href"]
+	method = ctrl_obj["method"].lower()
+	encoding = ctrl_obj["encoding"].lower()
+	schema = ctrl_obj["schema"]
+	assert method == "put"
+	assert encoding == "json"
+	body = _get_pcurrency_json("LTC", "200.0")
+	body["currencyname"] = obj["currencyname"]
+	validate(body, schema)
+	resp = client.put(href, json=body)
+	assert resp.status_code == 204
 
 def _check_control_post_method_pcurrency(ctrl, client, obj):
-    ctrl_obj = obj["@controls"][ctrl]
-    href = ctrl_obj["href"]
-    method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
-    schema = ctrl_obj["schema"]
-    assert method == "post"
-    assert encoding == "json"
-    body = _get_pcurrency_json("LTC", "200.0")
-    validate(body, schema)
-    # print(href)
-    resp = client.post(href, json=body)
-    # print(obj)
-    assert resp.status_code == 201
+	"""
+	Checks a POST type control from a JSON object be it root document or an item
+	in a collection. In addition to checking the "href" attribute, also checks
+	that method, encoding and schema can be found from the control. Also
+	validates a valid sensor against the schema of the control to ensure that
+	they match. Finally checks that using the control results in the correct
+	status code of 201.
+	"""
 
+	ctrl_obj = obj["@controls"][ctrl]
+	href = ctrl_obj["href"]
+	method = ctrl_obj["method"].lower()
+	encoding = ctrl_obj["encoding"].lower()
+	schema = ctrl_obj["schema"]
+	assert method == "post"
+	assert encoding == "json"
+	body = _get_pcurrency_json("LTC", "200.0")
+	validate(body, schema)
+	resp = client.post(href, json=body)
+	assert resp.status_code == 201
 
 
 class TestAccountCollection(object):
-	""" 
-	Tests of AccountCollection resource.
-	""" 
+	""" Tests for AccountCollection resource. """ 
 	RESOURCE_URL = "/api/accounts/"
 
 	def test_get(self, client):
+		""" Tests for GET method of AccountCollection resource. """
 		resp = client.get(self.RESOURCE_URL)
 		assert resp.status_code == 200
 		body = json.loads(resp.data)
@@ -206,8 +253,8 @@ class TestAccountCollection(object):
 			_check_control_get_method("portfolio", client, item)
 	
 	def test_post(self, client):
+		""" Tests for POST method of AccountCollection resource. """
 		valid = _get_account_json("juu", "testpwd")
-		#print(valid)
 
 		#test with wrong content type
 		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
@@ -278,23 +325,23 @@ class TestAccountItem(object):
        assert resp.status_code == 404
 
 
-
 class TestCryptoCurrencyCollection(object):
     """ Test for CryptoCurrencyCollection resource. """ 
 
     RESOURCE_URL = "/api/currencies/"
 
     def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        _check_namespace(client, body)
-        for control in body["@controls"]:
-            _check_control_get_method(control, client, body)
+    	""" Tests for GET method of CryptoCurrencyCollection resource. """
+    	resp = client.get(self.RESOURCE_URL)
+    	assert resp.status_code == 200
+    	body = json.loads(resp.data)
+    	_check_namespace(client, body)
+    	for control in body["@controls"]:
+    		_check_control_get_method(control, client, body)
+    	for item in body["items"]:
+    		_check_control_get_method("self", client, item)
+    		_check_control_get_method("profile", client, item)
 
-        for item in body["items"]:
-            _check_control_get_method("self", client, item)
-            _check_control_get_method("profile", client, item)
 
 class TestCryptoCurrencyItem(object):
     """ Test for CryptoCurrencyItem resource. """
@@ -351,54 +398,57 @@ class TestPortfolioCurrencyCollection(object):
             _check_control_get_method("profile", client, item)
 
     def test_post(self, client):
-        pass
+    	pass
+
+
+
 
 
 class TestPortfolioCurrency(object):
-	""" Tests for PortfolioCurrency resource. """
-	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
-	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
+    """ Tests for PortfolioCurrency resource. """
+    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
+    INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
-	def test_get(self, client):
-		resp = client.get(self.RESOURCE_URL)
-		assert resp.status_code == 200
-		body = json.loads(resp.data)
-		_check_namespace(client, body)
-		_check_control_get_method("profile", client, body)
-		_check_control_get_method("collection", client, body)
-		_check_control_get_method("crymo:currency-info", client, body)
-		_check_control_delete_method("crymo:delete", client, body)
-		resp = client.get(self.INVALID_URL)
-		assert resp.status_code == 404
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+        _check_control_get_method("profile", client, body)
+        _check_control_get_method("collection", client, body)
+        _check_control_get_method("crymo:currency-info", client, body)
+        _check_control_delete_method("crymo:delete", client, body)
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
 
-	def test_put(self, client):
-		""" Tests for PUT method of PortfolioCurrency resource. """
-		valid = _get_pcurrency_json("LTC", "200.0")
-		print(valid)
+    def test_put(self, client):
+        """ Tests for PUT method of PortfolioCurrency resource. """
+        valid = _get_pcurrency_json("LTC", 200.0)
 
-		#Test with wrong content type
-		resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-		assert resp.status_code == 415
+        #Test with wrong content type
+        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        assert resp.status_code == 415
 
 
-		#ADD TEST FOR STATUS CODE 404!!
-
+        #ADD TEST FOR STATUS CODE 404!!
 
 
 
+        # test with valid currencyname
+        valid["currencyname"] = "DOGE"
+        resp = client.put(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 204
 
+        #Test for invalid json 400
+        valid.pop("currencyname")
+        resp = client.put(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 400
 
-
-		# test with valid currencyname
-		valid["currencyname"] = "DOGE"
-		resp = client.put(self.RESOURCE_URL, json=valid)
-		assert resp.status_code == 204
-
-		#Test for invalid json 400
-		valid.pop("currencyname")
-		resp = client.put(self.RESOURCE_URL, json=valid)
-		print(resp)
-		assert resp.status_code == 400
-
-	def test_delete(self, client):
-		pass
+    def test_delete(self, client):
+        """ Tests for DELETE method of PortfolioCurrency resource. """
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 204
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 404
