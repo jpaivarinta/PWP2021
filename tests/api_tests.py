@@ -12,6 +12,10 @@ from datetime import datetime
 from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
 
+"""
+These tests are based on pwp-course-sensorhub-api-example by enkwolf
+"""
+
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()

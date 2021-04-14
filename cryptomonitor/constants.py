@@ -9,4 +9,3 @@ PORTFOLIO_PROFILE = "/profiles/portfolio/"
 PCURRENCY_PROFILE = "/profiles/pcurrency/"
 CCURRENCY_PROFILE = "/profiles/cryptocurrency/"
 
-MEASUREMENT_PAGE_SIZE = 50

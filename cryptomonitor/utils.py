@@ -3,6 +3,8 @@ from flask import Response, request, url_for
 from cryptomonitor.constants import *
 from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
+""" This is based on course material and pwp-course-sensorhub-api-example by enkwolf """
+
 class MasonBuilder(dict):
     """
     A convenience class for managing dictionaries that represent Mason

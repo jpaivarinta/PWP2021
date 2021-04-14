@@ -1,5 +1,6 @@
 """ Not sure yet if necessary"""
 from setuptools import find_packages, setup
+""" This is based on course material and pwp-course-sensorhub-api-example by enkwolf """
 
 setup(
     name="cryptomonitor",

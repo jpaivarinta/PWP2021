@@ -50,7 +50,10 @@ class PortfolioCurrency(Resource):
         try:
             validate(request.json, crypto_portfolio.get_schema())
         except ValidationError as e:
-            return create_error_response(400, "Invalid json body")
+            return create_error_response(400, "Invalid json body", str(e))
+
+        if float(request.json["currencyamount"]) == 0:
+            return create_error_response(400, "Invalid json body", "Currencyamount must be other than zero")
         # Get the user's portfolio
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
@@ -133,6 +136,9 @@ class PortfolioCurrencyCollection(Resource):
             validate(request.json, crypto_portfolio.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid json document", str(e))
+
+        if float(request.json["currencyamount"]) <= 0:
+            return create_error_response(400, "Invalid json document", "Currencyamount must be over zero")
 
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
