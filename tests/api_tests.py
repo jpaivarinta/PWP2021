@@ -355,50 +355,56 @@ class TestPortfolioCurrencyCollection(object):
 
 
 class TestPortfolioCurrency(object):
-	""" Tests for PortfolioCurrency resource. """
-	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
-	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
+    """ Tests for PortfolioCurrency resource. """
+    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
+    INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
-	def test_get(self, client):
-		resp = client.get(self.RESOURCE_URL)
-		assert resp.status_code == 200
-		body = json.loads(resp.data)
-		_check_namespace(client, body)
-		_check_control_get_method("profile", client, body)
-		_check_control_get_method("collection", client, body)
-		_check_control_get_method("crymo:currency-info", client, body)
-		_check_control_delete_method("crymo:delete", client, body)
-		resp = client.get(self.INVALID_URL)
-		assert resp.status_code == 404
+    def test_get(self, client):
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        _check_namespace(client, body)
+        _check_control_get_method("profile", client, body)
+        _check_control_get_method("collection", client, body)
+        _check_control_get_method("crymo:currency-info", client, body)
+        _check_control_delete_method("crymo:delete", client, body)
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
 
-	def test_put(self, client):
-		""" Tests for PUT method of PortfolioCurrency resource. """
-		valid = _get_pcurrency_json("LTC", "200.0")
-		print(valid)
+    def test_put(self, client):
+        """ Tests for PUT method of PortfolioCurrency resource. """
+        valid = _get_pcurrency_json("LTC", "200.0")
+        print(valid)
 
-		#Test with wrong content type
-		resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-		assert resp.status_code == 415
-
-
-		#ADD TEST FOR STATUS CODE 404!!
+        #Test with wrong content type
+        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        assert resp.status_code == 415
 
 
+        #ADD TEST FOR STATUS CODE 404!!
 
 
 
 
 
-		# test with valid currencyname
-		valid["currencyname"] = "DOGE"
-		resp = client.put(self.RESOURCE_URL, json=valid)
-		assert resp.status_code == 204
 
-		#Test for invalid json 400
-		valid.pop("currencyname")
-		resp = client.put(self.RESOURCE_URL, json=valid)
-		print(resp)
-		assert resp.status_code == 400
 
-	def test_delete(self, client):
-		pass
+        # test with valid currencyname
+        valid["currencyname"] = "DOGE"
+        resp = client.put(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 204
+
+        #Test for invalid json 400
+        valid.pop("currencyname")
+        resp = client.put(self.RESOURCE_URL, json=valid)
+        print(resp)
+        assert resp.status_code == 400
+
+    def test_delete(self, client):
+        """ Tests for DELETE method of PortfolioCurrency resource. """
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 204
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 404
