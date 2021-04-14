@@ -9,7 +9,7 @@ from cryptomonitor.constants import *
 
 class CryptoCurrencyItem(Resource):
     def get(self, currency):
-        currencyitem = CryptoCurrency.query.filter_by(abbreviation=currency).first()
+        currencyitem = CryptoCurrency.query.filter_by(abbreviation=currency.upper()).first()
         if currencyitem is None:
             return create_error_response(404, "Currency not in database")
 

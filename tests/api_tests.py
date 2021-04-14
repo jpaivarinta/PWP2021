@@ -361,9 +361,7 @@ class TestCryptoCurrencyItem(object):
         assert resp.status_code == 404
 
 class TestPortfolioItem(object):
-    """ 
-    Test cryptocurrencycollection
-    """ 
+    """ Test cryptocurrencycollection resource""" 
 
     RESOURCE_URL = "/api/accounts/test-account-1/portfolio/"
     INVALID_URL = "/api/accounts/jorma/portfolio/"
@@ -382,7 +380,7 @@ class TestPortfolioItem(object):
 
 class TestPortfolioCurrencyCollection(object):
     
-    """ Test portfoliocurrencycollection """
+    """ Test portfoliocurrencycollection resource """
     
     RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
@@ -398,10 +396,26 @@ class TestPortfolioCurrencyCollection(object):
             _check_control_get_method("profile", client, item)
 
     def test_post(self, client):
-    	pass
 
+        valid = _get_pcurrency_json("LTC", "666.666")        
+        #test with wrong content type
+        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
+        assert resp.status_code == 415
 
+        #Test with valid and see if exists afterwards
+        resp = client.post(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 201
+        resp = client.get(resp.headers["Location"])
+        assert resp.status_code == 200
 
+        # send same data again for 409
+        resp = client.post(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 409
+
+        # remove model field for 400
+        valid.pop("currencyname")
+        resp = client.post(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 400
 
 
 class TestPortfolioCurrency(object):
@@ -423,19 +437,19 @@ class TestPortfolioCurrency(object):
 
     def test_put(self, client):
         """ Tests for PUT method of PortfolioCurrency resource. """
-        valid = _get_pcurrency_json("LTC", 200.0)
+        valid = _get_pcurrency_json("LTC", "200.0")
 
         #Test with wrong content type
         resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
         assert resp.status_code == 415
 
 
-        #ADD TEST FOR STATUS CODE 404!!
-
+        # Test with non existent cryptocurrency
+        resp = client.put(self.INVALID_URL, json=valid)
+        assert resp.status_code == 404
 
 
         # test with valid currencyname
-        valid["currencyname"] = "DOGE"
         resp = client.put(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 204
 
