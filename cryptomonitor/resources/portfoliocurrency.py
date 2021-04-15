@@ -52,8 +52,8 @@ class PortfolioCurrency(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid json body", str(e))
 
-        if float(request.json["currencyamount"]) == 0:
-            return create_error_response(400, "Invalid json body", "Currencyamount must be other than zero")
+        if float(request.json["currencyamount"]) < 0:
+            return create_error_response(400, "Invalid json body", "Currencyamount can't be negative")
         # Get the user's portfolio
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()

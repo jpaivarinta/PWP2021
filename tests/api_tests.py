@@ -1,111 +1,135 @@
-import pytest
 import json
-import tempfile
 import os
-import time
-
-from sqlalchemy.engine import Engine
-from jsonschema import validate, ValidationError
-from sqlalchemy import event
-from cryptomonitor import create_app, db
+import tempfile
 from datetime import datetime
-from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
+import pytest
+from cryptomonitor import create_app, db
+from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
+from jsonschema import validate
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 """
 These tests are based on pwp-course-sensorhub-api-example by enkwolf
 """
 
+
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
+	cursor = dbapi_connection.cursor()
+	cursor.execute("PRAGMA foreign_keys=ON")
+	cursor.close()
+
 
 @pytest.fixture
 def client():
-    db_fd, db_fname = tempfile.mkstemp()
-    config = {
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///" + db_fname,
-        "TESTING": True
-    }
-    
-    app = create_app(config)
-    
-    with app.app_context():
-        db.create_all()
-        _populate_db()
-        
-    yield app.test_client()
-    
-    os.close(db_fd)
-    os.unlink(db_fname)
+	db_fd, db_fname = tempfile.mkstemp()
+	config = {
+		"SQLALCHEMY_DATABASE_URI": "sqlite:///" + db_fname,
+		"TESTING": True
+	}
+
+	app = create_app(config)
+
+	with app.app_context():
+		db.create_all()
+		_populate_db()
+
+	yield app.test_client()
+
+	os.close(db_fd)
+	os.unlink(db_fname)
+
 
 def _populate_db():
-    cc = _get_CryptoCurrency()
-    cc2 = _get_CryptoCurrency2()
-    cc3 = _get_CryptoCurrency3()
-    db.session.add(cc)
-    db.session.add(cc2)
-    db.session.add(cc3)
+	cc = _get_CryptoCurrency()
+	cc2 = _get_CryptoCurrency2()
+	cc3 = _get_CryptoCurrency3()
+	db.session.add(cc)
+	db.session.add(cc2)
+	db.session.add(cc3)
 
-    for i in range(1, 4):
-        a = UserAccount(
-            name = "test-account-{}".format(i),
-            password = "testpwd"
-        )
-        p = Portfolio(
-            timestamp = datetime.now(),
-            value = float(i * 100)
-        )
-        a.portfolio = p
-        cp = crypto_portfolio(portfolio=p, cryptocurrency=cc, currencyAmount=500.0)
-        cp2 = crypto_portfolio(portfolio=p, cryptocurrency=cc2, currencyAmount=47666.0)
-        p.cryptocurrencies.append(cp)
-        p.cryptocurrencies.append(cp2)
-        db.session.add(cp)
-        db.session.add(cp2)
-        db.session.add(a)
-        db.session.add(p)
-    db.session.commit()
+	for i in range(1, 4):
+		a = UserAccount(
+			name="test-account-{}".format(i),
+			password="testpwd"
+		)
+		p = Portfolio(
+			timestamp=datetime.now(),
+			value=float(i * 100)
+		)
+		a.portfolio = p
+		cp = crypto_portfolio(portfolio=p, cryptocurrency=cc, currencyAmount=500.0)
+		cp2 = crypto_portfolio(portfolio=p, cryptocurrency=cc2, currencyAmount=47666.0)
+		p.cryptocurrencies.append(cp)
+		p.cryptocurrencies.append(cp2)
+		db.session.add(cp)
+		db.session.add(cp2)
+		db.session.add(a)
+		db.session.add(p)
+	db.session.commit()
+
 
 def _get_pcurrency_json(name, amount):
-    return {"currencyname": "{}".format(name), "currencyamount": "{}".format(amount)}
+	"""
+	Get a valid portfoliocurrency object
+	Args:
+		name: Abbreviation of the cryptocurrency
+		amount: Amount of cryptocurrencies
+
+	Returns:
+	Portfoliocurrency object
+	"""
+	return {"currencyname": "{}".format(name), "currencyamount": "{}".format(amount)}
+
 
 def _get_account_json(name, password):
-    return {"name": "{}".format(name), "password": "{}".format(password)}
+	"""
+	Get valid account object.
+	Args:
+		name: Name of the account
+		password: Password of the account
+
+	Returns:
+	Account object
+	"""
+	return {"name": "{}".format(name), "password": "{}".format(password)}
+
 
 def _get_CryptoCurrency():
 	return CryptoCurrency(
-	    name="DogeCoin",
-	    abbreviation="DOGE",
-	    timestamp=datetime.now(),
-	    value=0.0462,
-	    daily_growth=7.1,
-	    launchDate=datetime(2012,5,12),
-	    blockchain_length=3610463
+		name="DogeCoin",
+		abbreviation="DOGE",
+		timestamp=datetime.now(),
+		value=0.0462,
+		daily_growth=7.1,
+		launchDate=datetime(2012, 5, 12),
+		blockchain_length=3610463
 	)
+
 
 def _get_CryptoCurrency2():
 	return CryptoCurrency(
-	    name="Bitcoin",
-	    abbreviation="BTC",
-	    timestamp=datetime.now(),
-	    value=50000.00,
-	    daily_growth=7.1,
-	    launchDate=datetime(2012,5,12),
-	    blockchain_length=3610463
+		name="Bitcoin",
+		abbreviation="BTC",
+		timestamp=datetime.now(),
+		value=50000.00,
+		daily_growth=7.1,
+		launchDate=datetime(2012, 5, 12),
+		blockchain_length=3610463
 	)
+
 
 def _get_CryptoCurrency3():
 	return CryptoCurrency(
-	    name="Litecoin",
-	    abbreviation="LTC",
-	    timestamp=datetime.now(),
-	    value=10000.00,
-	    daily_growth=2.1,
-	    launchDate=datetime(1500,5,12),
-	    blockchain_length=3610463
+		name="Litecoin",
+		abbreviation="LTC",
+		timestamp=datetime.now(),
+		value=10000.00,
+		daily_growth=2.1,
+		launchDate=datetime(1500, 5, 12),
+		blockchain_length=3610463
 	)
 
 
@@ -120,6 +144,7 @@ def _check_namespace(client, response):
 	resp = client.get(ns_href)
 	assert resp.status_code == 200
 
+
 def _check_control_get_method(ctrl, client, obj):
 	"""
 	Checks a GET type control from a JSON object be it root document or an item
@@ -128,6 +153,7 @@ def _check_control_get_method(ctrl, client, obj):
 	href = obj["@controls"][ctrl]["href"]
 	resp = client.get(href)
 	assert resp.status_code == 200
+
 
 def _check_control_delete_method(ctrl, client, obj):
 	"""
@@ -167,6 +193,7 @@ def _check_control_put_method_account(ctrl, client, obj):
 	validate(body, schema)
 	resp = client.put(href, json=body)
 	assert resp.status_code == 204
+
 
 def _check_control_post_method_account(ctrl, client, obj):
 	"""
@@ -216,6 +243,7 @@ def _check_control_put_method_pcurrency(ctrl, client, obj):
 	resp = client.put(href, json=body)
 	assert resp.status_code == 204
 
+
 def _check_control_post_method_pcurrency(ctrl, client, obj):
 	"""
 	Checks a POST type control from a JSON object be it root document or an item
@@ -240,7 +268,7 @@ def _check_control_post_method_pcurrency(ctrl, client, obj):
 
 
 class TestAccountCollection(object):
-	""" Tests for AccountCollection resource. """ 
+	""" Tests for AccountCollection resource. """
 	RESOURCE_URL = "/api/accounts/"
 
 	def test_get(self, client):
@@ -250,21 +278,21 @@ class TestAccountCollection(object):
 		body = json.loads(resp.data)
 		_check_namespace(client, body)
 		_check_control_post_method_account("crymo:add-account", client, body)
-		assert len (body["items"]) == 3
+		assert len(body["items"]) == 3
 		for item in body["items"]:
 			_check_control_get_method("self", client, item)
 			_check_control_get_method("profile", client, item)
 			_check_control_get_method("portfolio", client, item)
-	
+
 	def test_post(self, client):
 		""" Tests for POST method of AccountCollection resource. """
 		valid = _get_account_json("juu", "testpwd")
 
-		#test with wrong content type
+		# test with wrong content type
 		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
 		assert resp.status_code == 415
 
-		#Test with valid and see if exists afterwards
+		# Test with valid and see if exists afterwards
 		resp = client.post(self.RESOURCE_URL, json=valid)
 		assert resp.status_code == 201
 		resp = client.get(resp.headers["Location"])
@@ -279,194 +307,198 @@ class TestAccountCollection(object):
 		resp = client.post(self.RESOURCE_URL, json=valid)
 		assert resp.status_code == 400
 
+
 class TestAccountItem(object):
-    """ Tests for AccountItem resource. """
-    RESOURCE_URL = "/api/accounts/test-account-1/"
-    INVALID_URL = "/api/accounts/non-account-x/"
+	""" Tests for AccountItem resource. """
+	RESOURCE_URL = "/api/accounts/test-account-1/"
+	INVALID_URL = "/api/accounts/non-account-x/"
 
-    def test_get(self, client):
-    	""" Tests for GET method of AccountItem resource. """
-    	resp = client.get(self.RESOURCE_URL)
-    	body = json.loads(resp.data)
-    	_check_namespace(client, body)
-    	_check_control_get_method("profile", client, body)
-    	_check_control_get_method("crymo:accounts-all", client, body)
-    	_check_control_put_method_account("edit", client, body)
-    	_check_control_delete_method("crymo:delete", client, body)
-    	resp = client.get(self.INVALID_URL)
-    	assert resp.status_code == 404
+	def test_get(self, client):
+		""" Tests for GET method of AccountItem resource. """
+		resp = client.get(self.RESOURCE_URL)
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		_check_control_get_method("profile", client, body)
+		_check_control_get_method("crymo:accounts-all", client, body)
+		_check_control_put_method_account("edit", client, body)
+		_check_control_delete_method("crymo:delete", client, body)
+		resp = client.get(self.INVALID_URL)
+		assert resp.status_code == 404
 
-    def test_put(self, client):
-    	""" Tests for PUT method of AccountItem resource. """
-    	valid = _get_account_json("pekka", "testpwd")
+	def test_put(self, client):
+		""" Tests for PUT method of AccountItem resource. """
+		valid = _get_account_json("pekka", "testpwd")
 
-    	#Test with wrong content type
-    	resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-    	assert resp.status_code == 415
+		# Test with wrong content type
+		resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+		assert resp.status_code == 415
 
-    	#Test with another account's name
-    	valid["name"] = "test-account-2"
-    	resp = client.put(self.RESOURCE_URL, json=valid)
-    	assert resp.status_code == 409
+		# Test with another account's name
+		valid["name"] = "test-account-2"
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 409
 
-    	#Test with valid
-    	valid["name"] = "test-account-1"
-    	resp = client.put(self.RESOURCE_URL, json=valid)
-    	assert resp.status_code == 204
+		# Test with valid
+		valid["name"] = "test-account-1"
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 204
 
-    	#Remove account for 400
-    	valid.pop("name")
-    	resp = client.put(self.RESOURCE_URL, json=valid)
-    	assert resp.status_code == 400
+		# Remove account for 400
+		valid.pop("name")
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 400
 
-    def test_delete(self, client):
-       """ Tests for DELETE method of AccountItem resource. """
-       resp = client.delete(self.RESOURCE_URL)
-       assert resp.status_code == 204
-       resp = client.delete(self.RESOURCE_URL)
-       assert resp.status_code == 404
-       resp = client.delete(self.INVALID_URL)
-       assert resp.status_code == 404
+	def test_delete(self, client):
+		""" Tests for DELETE method of AccountItem resource. """
+		resp = client.delete(self.RESOURCE_URL)
+		assert resp.status_code == 204
+		resp = client.delete(self.RESOURCE_URL)
+		assert resp.status_code == 404
+		resp = client.delete(self.INVALID_URL)
+		assert resp.status_code == 404
 
 
 class TestCryptoCurrencyCollection(object):
-    """ Test for CryptoCurrencyCollection resource. """ 
+	""" Test for CryptoCurrencyCollection resource. """
 
-    RESOURCE_URL = "/api/currencies/"
+	RESOURCE_URL = "/api/currencies/"
 
-    def test_get(self, client):
-    	""" Tests for GET method of CryptoCurrencyCollection resource. """
-    	resp = client.get(self.RESOURCE_URL)
-    	assert resp.status_code == 200
-    	body = json.loads(resp.data)
-    	_check_namespace(client, body)
-    	for control in body["@controls"]:
-    		_check_control_get_method(control, client, body)
-    	for item in body["items"]:
-    		_check_control_get_method("self", client, item)
-    		_check_control_get_method("profile", client, item)
+	def test_get(self, client):
+		""" Tests for GET method of CryptoCurrencyCollection resource. """
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		for control in body["@controls"]:
+			_check_control_get_method(control, client, body)
+		for item in body["items"]:
+			_check_control_get_method("self", client, item)
+			_check_control_get_method("profile", client, item)
 
 
 class TestCryptoCurrencyItem(object):
-    """ Test for CryptoCurrencyItem resource. """
+	""" Test for CryptoCurrencyItem resource. """
 
-    RESOURCE_URL = "/api/currencies/DOGE/"
-    INVALID_URL = "/api/currencies/DOGGO/"
+	RESOURCE_URL = "/api/currencies/DOGE/"
+	INVALID_URL = "/api/currencies/DOGGO/"
 
-    def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        _check_namespace(client, body)
-        for control in body["@controls"]:
-            _check_control_get_method(control, client, body)
-        
-        resp = client.get(self.INVALID_URL)
-        assert resp.status_code == 404
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		for control in body["@controls"]:
+			_check_control_get_method(control, client, body)
+
+		resp = client.get(self.INVALID_URL)
+		assert resp.status_code == 404
+
 
 class TestPortfolioItem(object):
-    """ Test cryptocurrencycollection resource""" 
+	""" Test cryptocurrencycollection resource"""
 
-    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/"
-    INVALID_URL = "/api/accounts/jorma/portfolio/"
+	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/"
+	INVALID_URL = "/api/accounts/jorma/portfolio/"
 
-    def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        _check_namespace(client, body)
-        for control in body["@controls"]:
-            _check_control_get_method(control, client, body)
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		for control in body["@controls"]:
+			_check_control_get_method(control, client, body)
 
-        resp = client.get(self.INVALID_URL)
-        assert resp.status_code == 404
+		resp = client.get(self.INVALID_URL)
+		assert resp.status_code == 404
 
 
 class TestPortfolioCurrencyCollection(object):
-    
-    """ Test portfoliocurrencycollection resource """
-    
-    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
+	""" Test portfoliocurrencycollection resource """
 
-    def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        _check_namespace(client, body)
-        _check_control_post_method_pcurrency("crymo:add-pcurrency", client, body)
-        assert len (body["items"]) == 2
-        for item in body["items"]:
-            _check_control_get_method("self", client, item)
-            _check_control_get_method("profile", client, item)
+	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
-    def test_post(self, client):
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		_check_control_post_method_pcurrency("crymo:add-pcurrency", client, body)
+		assert len(body["items"]) == 2
+		for item in body["items"]:
+			_check_control_get_method("self", client, item)
+			_check_control_get_method("profile", client, item)
 
-        valid = _get_pcurrency_json("LTC", "666.666")        
-        #test with wrong content type
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
-        assert resp.status_code == 415
+	def test_post(self, client):
+		valid = _get_pcurrency_json("LTC", "666.666")
+		# test with wrong content type
+		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
+		assert resp.status_code == 415
 
-        #Test with valid and see if exists afterwards
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 201
-        resp = client.get(resp.headers["Location"])
-        assert resp.status_code == 200
+		# Test with valid and see if exists afterwards
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 201
+		resp = client.get(resp.headers["Location"])
+		assert resp.status_code == 200
 
-        # send same data again for 409
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 409
+		# send same data again for 409
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 409
 
-        # remove model field for 400
-        valid.pop("currencyname")
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 400
+		# remove model field for 400
+		valid.pop("currencyname")
+		resp = client.post(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 400
 
 
 class TestPortfolioCurrency(object):
-    """ Tests for PortfolioCurrency resource. """
-    RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
-    INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
+	""" Tests for PortfolioCurrency resource. """
+	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/DOGE/"
+	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
-    def test_get(self, client):
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        _check_namespace(client, body)
-        _check_control_get_method("profile", client, body)
-        _check_control_get_method("collection", client, body)
-        _check_control_get_method("crymo:currency-info", client, body)
-        _check_control_delete_method("crymo:delete", client, body)
-        resp = client.get(self.INVALID_URL)
-        assert resp.status_code == 404
+	def test_get(self, client):
+		resp = client.get(self.RESOURCE_URL)
+		assert resp.status_code == 200
+		body = json.loads(resp.data)
+		_check_namespace(client, body)
+		_check_control_get_method("profile", client, body)
+		_check_control_get_method("collection", client, body)
+		_check_control_get_method("crymo:currency-info", client, body)
+		_check_control_delete_method("crymo:delete", client, body)
+		resp = client.get(self.INVALID_URL)
+		assert resp.status_code == 404
 
-    def test_put(self, client):
-        """ Tests for PUT method of PortfolioCurrency resource. """
-        valid = _get_pcurrency_json("LTC", "200.0")
+	def test_put(self, client):
+		""" Tests for PUT method of PortfolioCurrency resource. """
+		valid = _get_pcurrency_json("LTC", "200.0")
 
-        #Test with wrong content type
-        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-        assert resp.status_code == 415
+		# Test with wrong content type
+		resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+		assert resp.status_code == 415
+
+		# Test with non existent cryptocurrency
+		resp = client.put(self.INVALID_URL, json=valid)
+		assert resp.status_code == 404
+
+		# test with valid currencyname
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 204
+
+		# Test with negative currencyamount 400
+		valid["currencyamount"] = str(-222.4)
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 400
 
 
-        # Test with non existent cryptocurrency
-        resp = client.put(self.INVALID_URL, json=valid)
-        assert resp.status_code == 404
+		# Test for invalid json 400
+		valid.pop("currencyname")
+		resp = client.put(self.RESOURCE_URL, json=valid)
+		assert resp.status_code == 400
 
-
-        # test with valid currencyname
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 204
-
-        #Test for invalid json 400
-        valid.pop("currencyname")
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 400
-
-    def test_delete(self, client):
-        """ Tests for DELETE method of PortfolioCurrency resource. """
-        resp = client.delete(self.RESOURCE_URL)
-        assert resp.status_code == 204
-        resp = client.delete(self.RESOURCE_URL)
-        assert resp.status_code == 404
-        resp = client.delete(self.RESOURCE_URL)
-        assert resp.status_code == 404
+	def test_delete(self, client):
+		""" Tests for DELETE method of PortfolioCurrency resource. """
+		resp = client.delete(self.RESOURCE_URL)
+		assert resp.status_code == 204
+		resp = client.delete(self.RESOURCE_URL)
+		assert resp.status_code == 404
+		resp = client.delete(self.RESOURCE_URL)
+		assert resp.status_code == 404
