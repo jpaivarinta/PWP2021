@@ -10,8 +10,10 @@ from jsonschema import validate
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
-"""
-These tests are based on pwp-course-sensorhub-api-example by enkwolf
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
 

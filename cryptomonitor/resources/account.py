@@ -8,7 +8,11 @@ from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
 from cryptomonitor import db
 
-""" This is based on course material and pwp-course-sensorhub-api-example by enkwolf """
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
 
 class AccountCollection(Resource):
     def get(self):

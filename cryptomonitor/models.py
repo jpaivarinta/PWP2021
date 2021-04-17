@@ -5,6 +5,11 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from cryptomonitor import db
 
+""" 
+Source and help from
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
+
 # cryptoPortfolio = db.Table("cryptoPortfolio",
 #     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
 #     db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),

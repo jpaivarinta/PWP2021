@@ -1,5 +1,7 @@
-"""
-Help and example from https://github.com/enkwolf/pwp-course-sensorhub-api-example/blob/master/sensorhub/constants.py
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 MASON = "application/vnd.mason+json"
 LINK_RELATIONS_URL = "/crymo/link-relations/"

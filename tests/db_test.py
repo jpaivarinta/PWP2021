@@ -9,6 +9,11 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 
+""" 
+Source and help from
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
+
 
 """
 *** DATABASE TESTS ***

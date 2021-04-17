@@ -3,7 +3,11 @@ from flask import Response, request, url_for
 from cryptomonitor.constants import *
 from cryptomonitor.models import UserAccount, Portfolio, CryptoCurrency, crypto_portfolio
 
-""" This is based on course material and pwp-course-sensorhub-api-example by enkwolf """
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
 
 class MasonBuilder(dict):
     """

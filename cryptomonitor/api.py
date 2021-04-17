@@ -6,6 +6,12 @@ from cryptomonitor.resources.cryptocurrency import CryptoCurrencyItem, CryptoCur
 from cryptomonitor.resources.portfolio import PortfolioItem
 from cryptomonitor.resources.portfoliocurrency import PortfolioCurrency, PortfolioCurrencyCollection
 
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
+
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_bp)
 

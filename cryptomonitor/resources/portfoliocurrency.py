@@ -8,6 +8,12 @@ from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
 from cryptomonitor import db
 
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
+
 class PortfolioCurrency(Resource):
     def get(self, account, pcurrency):
         user = UserAccount.query.filter_by(name=account).first()

@@ -6,6 +6,11 @@ from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.models import CryptoCurrency
 from cryptomonitor.constants import *
 
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
 
 class CryptoCurrencyItem(Resource):
     def get(self, currency):

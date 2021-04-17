@@ -1,7 +1,10 @@
 """ Not sure yet if necessary"""
 from setuptools import find_packages, setup
-""" This is based on course material and pwp-course-sensorhub-api-example by enkwolf """
-
+""" 
+Source and help from
+https://github.com/enkwolf/pwp-course-sensorhub-api-example and
+https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
+"""
 setup(
     name="cryptomonitor",
     version="0.1.0",
