@@ -17,9 +17,6 @@ https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 class AccountCollection(Resource):
     def get(self):
         
-        if request.method != 'GET':
-            return "GET method required", 405
-
         body = CryptoMonitorBuilder(items = [])
         for single_account in UserAccount.query.all():
             item =  CryptoMonitorBuilder(                
