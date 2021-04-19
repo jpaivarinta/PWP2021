@@ -135,7 +135,7 @@ def generate_test_data():
         value = 50000.0,
         daily_growth = 2.5
     )
-    c1 = CryptoCurrency(
+    c2 = CryptoCurrency(
         name = "Ethereum",
         abbreviation = "ETH",
         timestamp = datetime.now(),
