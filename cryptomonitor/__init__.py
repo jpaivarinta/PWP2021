@@ -1,5 +1,6 @@
 import os
-from flask import Flask
+import json
+from flask import Flask, Response
 from flask_sqlalchemy import SQLAlchemy
 from cryptomonitor.constants import *
 
@@ -41,5 +42,29 @@ def create_app(test_config=None):
 	@app.route("/profiles/<profile>/")
 	def send_profile(profile):
 		return "you requests {} profile".format(profile)
+
+	@app.route("/api/")
+	def index():
+		"""Returning entry point contents"""
+		body = {
+			"@namespaces": {
+				"crymo": {
+					"name": "/cryptomonitor/link-relations/#"
+				}
+			},
+			"@controls": {
+				"crymo:currencies-all": {
+					"href": "/api/currencies/"
+				},
+				"crymo:accounts-all": {
+					"href": "/api/accounts/"
+				}
+			}
+		}
+		return Response(
+			status=200,
+			response=json.dumps(body),
+			mimetype=MASON
+		)
 
 	return app

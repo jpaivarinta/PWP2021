@@ -30,11 +30,47 @@ def main_menu():
             print("Invalid input, try again")
             continue
 
+
+### ACCOUNT related mehtods ###
 def get_all_accounts():
     """Requests and prints a list of all Accounts"""
     resp = request.get(API_URL + "/accounts/")
     body = resp.json()
+    print("ACCOUNTS:")
+    for item in body["items"]:
+        print("Id: "+str(item["id"]))
+        print("Name: "+str(item["name"]))
+        print("Portfolio-ID: "+str(item["portfolio_id"]))
 
+
+def post_account():
+    pass    
+def get_account():
+    pass
+def put_account():
+    pass
+def delete_account():
+    pass
+
+
+### Portfolio related methods ###
+def get_portfolio():
+    pass
+
+### PCurrency related methods ###
+def get_all_pcurrencies():
+    pass
+def post_pcurrency():
+    pass
+
+
+
+### CryptoCurrency related methods ###
+
+def get_cryptocurrencies():
+    pass
+def get_cryptocurrency():
+    pass
 
 
 #Run the application
