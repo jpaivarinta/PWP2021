@@ -7,7 +7,8 @@ pwp-2021/
 */__pycache__
 **/__pycache__/
 **/.pytest_cache/
-/tests/.coverage
+tests/.coverage
 /.coverage.DESKTOP-0M7VTQL.35928.058076
 .idea/
 instance/
+.coverage/
