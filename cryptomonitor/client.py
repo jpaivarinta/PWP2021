@@ -1,5 +1,7 @@
 import requests
 import sys
+import json
+from jsonschema import ValidationError
 
 API_URL = "http://127.0.0.1:5000"
 
@@ -31,7 +33,7 @@ def main_menu():
             continue
 
 
-### ACCOUNT related mehtods ###
+### ACCOUNT related methods ###
 def get_all_accounts():
     """Requests and prints a list of all Accounts"""
     resp = request.get(API_URL + "/accounts/")
@@ -42,9 +44,8 @@ def get_all_accounts():
         print("Name: "+str(item["name"]))
         print("Portfolio-ID: "+str(item["portfolio_id"]))
 
-
 def post_account():
-    pass    
+    pass
 def get_account():
     pass
 def put_account():
@@ -72,6 +73,27 @@ def get_cryptocurrencies():
 def get_cryptocurrency():
     pass
 
+
+def convert_value(value, schema_props):
+    if schema_props["type"] == "number":
+        try:
+            value = int(value)
+        except ValueError:
+            value = float(value)
+    if schema_props["type"] == "integer":
+        value = int(value)
+    if schema_props["type"] == "string":
+        value = str(value)
+    return value
+
+def submit_data(s, ctrl, data):
+    resp = s.request(
+        ctrl["method"],
+        "" + ctrl["href"],
+        data=json.dumps(data),
+        headers = {"Content-type": "application/json"}
+    )
+    return resp
 
 #Run the application
 main()
