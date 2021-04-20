@@ -35,7 +35,7 @@ def start_menu():
 def login():
     account = input("Accountname: ")
     password = input("Password: ")
-    resp = Re
+    # resp = Re
 
 
 
@@ -72,15 +72,13 @@ def get_account(username):
     resp = requests.get(account_url)
     acc_body = resp.json()
     pfolio_url = acc_body["@controls"]["portfolio"]["href"]
-    print(pfolio_url)
-    #resp = requests.get(pfolio_url)
-    #print(resp)
-    #pfolio_body = resp.json()
-    #print("ACCOUNT:")
-    #print("Name: " + str(acc_body["name"]))
-    #print("Portfolio value: " + str(pfolio_body["value"]))
+    resp = requests.get(API_URL + pfolio_url)
+    pfolio_body = resp.json()
+    print("ACCOUNT:")
+    print("Name: " + str(acc_body["name"]))
+    print("Portfolio value: " + str(pfolio_body["value"]))
 
-    #return acc_body, pfolio_body
+    return acc_body, pfolio_body
 
 def put_account(username, new_username, passwd):
     information = get_account_json(new_username, passwd)
