@@ -34,33 +34,76 @@ def main_menu():
 
 
 ### ACCOUNT related methods ###
+
+def get_account_json(name, password):
+    """
+    Get valid account object.
+    Args:
+        name: Name of the account
+        password: Password of the account
+
+    Returns:
+    Account object
+    """
+    return {"name": "{}".format(name), "password": "{}".format(password)}
+
 def get_all_accounts():
     """Requests and prints a list of all Accounts"""
-    resp = request.get(API_URL + "/accounts/")
+    resp = request.get(API_URL + "/api/accounts/")
     body = resp.json()
     print("ACCOUNTS:")
     for item in body["items"]:
         print("Id: "+str(item["id"]))
         print("Name: "+str(item["name"]))
         print("Portfolio-ID: "+str(item["portfolio_id"]))
+    return resp
 
-def post_account():
-    pass
-def get_account():
-    pass
-def put_account():
-    pass
-def delete_account():
-    pass
+def post_account(username, passwd):
+    information = get_account_json(username, passwd)
+    resp = client.post(API_URL + "/api/accounts/", data=json.dumps(information))
+    return resp
 
+def get_account(username):
+    get_url = API_URL + "/api/accounts/" + str(username) + "/"
+    resp = client.get(get_url)
+    acc_body = resp.json()
+
+    pfolio = body["@controls"]["portfolio"]["href"]
+    resp = client.get(get_url)
+    pfolio_body = resp.json()
+
+    print("ACCOUNT:")
+    print("Name: " + str(acc_body["name"]))
+    print("Portfolio value: " + str(pfolio_body["value"]))
+
+    return acc_body, pfolio_body
+
+def put_account(username, new_username, passwd):
+    information = get_account_json(new_username, passwd)
+    resp = client.put(API_URL + "/api/accounts/", data=json.dumps(information))
+    return resp
+
+def delete_account(username):
+    delete_url = API_URL + "/api/accounts/" + str(username) + "/"
+    resp = client.delete(delete_url)
+    return resp
 
 ### Portfolio related methods ###
-def get_portfolio():
-    pass
+def get_portfolio(username):
+    get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
+    resp = client.get(get_url)
+    return resp
+    
 
 ### PCurrency related methods ###
-def get_all_pcurrencies():
-    pass
+def get_all_pcurrencies(useraccount):
+    get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
+    resp = client.get(get_url)
+    body = json.loads(resp.data)
+#    for item in body["items"]:
+#        print(item[""])
+    return resp
+
 def post_pcurrency():
     pass
 
@@ -69,9 +112,11 @@ def post_pcurrency():
 ### CryptoCurrency related methods ###
 
 def get_cryptocurrencies():
-    pass
-def get_cryptocurrency():
-    pass
+    return client.get(API_URL + "/api/currencies/")
+
+def get_cryptocurrency(abbreviation):
+    currency_url = (API_URL + "/api/currencies/" + str(abbrevation).lower() + "/")
+    return client.get(currency_url) 
 
 
 def convert_value(value, schema_props):
