@@ -3,10 +3,11 @@ from jsonschema import validate, ValidationError
 from flask import request, Response, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-from cryptomonitor.models import UserAccount
+from cryptomonitor.models import UserAccount, Portfolio
 from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
 from cryptomonitor import db
+from datetime import datetime
 
 """ 
 Source and help from
@@ -19,8 +20,11 @@ class AccountCollection(Resource):
         
         body = CryptoMonitorBuilder(items = [])
         for single_account in UserAccount.query.all():
-            item =  CryptoMonitorBuilder(                
-                account=single_account.name,
+            item =  CryptoMonitorBuilder(     
+                id=single_account.id,
+                name=single_account.name,
+                password=single_account.password,
+                portfolio_id=single_account.portfolio_id
             )
             item.add_control("self", url_for("api.accountitem", account=single_account.name))
             item.add_control("profile", ACCOUNT_PROFILE)
@@ -50,9 +54,14 @@ class AccountCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
+        portfolio = Portfolio(
+            timestamp=datetime.now(),
+            value=0.0
+        )
         useraccount = UserAccount(
             name=request.json["name"],
-            password=request.json["password"]
+            password=request.json["password"],
+            portfolio = portfolio
         )
 
         try:

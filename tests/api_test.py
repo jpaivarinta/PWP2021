@@ -404,6 +404,7 @@ class TestPortfolioItem(object):
 
 	def test_get(self, client):
 		resp = client.get(self.RESOURCE_URL)
+		print(resp)
 		assert resp.status_code == 200
 		body = json.loads(resp.data)
 		_check_namespace(client, body)

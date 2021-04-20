@@ -6,81 +6,85 @@ from jsonschema import ValidationError
 API_URL = "http://127.0.0.1:5000"
 
 def main():
-    main_menu()
+	start_menu()
 
 
-def main_menu():
+def start_menu():
     print("*** CryptoMonitoring API Client ***")
     while True:
         print("Choose the functionality you want to use:\n")
-        print("(A) Accounts")
-        print("(C) CryptoCurrencies")
-        print("(E) Exit application")
-        choice = input("Type A, C or E: ")
+        print("(L) Login")
+        print("(R) Register")
+        print("(Q) Quit")
+        choice = input("Type L, R or Q: ")
         choice = choice.lower()
 
-        if(choice == "a" or choice == "accounts"):
-            print("Accounts chosen\n")
-            return "ACCOUNTS"
-        elif(choice == "c" or choice == "cryptocurrencies"):
-            print("CryptoCurrencies chosen\n")
-            return "CRYPTOCURRENCIES"
-        elif(choice == "e" or choice == "exit"):
-            print("Exit chosen, terminating app.")
+        if(choice == "l" or choice == "login"):
+            print("Login chosen\n")
+            return "LOGIN"
+        elif(choice == "r" or choice == "register"):
+            print("Register chosen\n")
+            return "REGISTER"
+        elif(choice == "q" or choice == "quit"):
+            print("Quit chosen, terminating app.")
             sys.exit()
         else:
             print("Invalid input, try again")
             continue
 
+def login():
+    account = input("Accountname: ")
+    password = input("Password: ")
+    resp = Re
+
+
+
 
 ### ACCOUNT related methods ###
 
-def get_account_json(name, password):
-    """
-    Get valid account object.
-    Args:
-        name: Name of the account
-        password: Password of the account
-
-    Returns:
-    Account object
-    """
-    return {"name": "{}".format(name), "password": "{}".format(password)}
-
 def get_all_accounts():
     """Requests and prints a list of all Accounts"""
-    resp = request.get(API_URL + "/api/accounts/")
+    resp = requests.get(API_URL + "/api/accounts/")
     body = resp.json()
-    print("ACCOUNTS:")
+    print("\nACCOUNTS:\n")
     for item in body["items"]:
-        print("Id: "+str(item["id"]))
+        print("ID: "+str(item["id"]))
         print("Name: "+str(item["name"]))
+        print("Password: "+str(item["password"]))
         print("Portfolio-ID: "+str(item["portfolio_id"]))
+        print("")
     return resp
 
-def post_account(username, passwd):
-    information = get_account_json(username, passwd)
-    resp = client.post(API_URL + "/api/accounts/", data=json.dumps(information))
+def post_account():
+    print("ADD A NEW ACCOUNT")
+    data = {}
+    name = input("Type account name: ")
+    pswd = input("Type password: ")
+    data["name"] = name
+    data["password"] = pswd
+    print(data)
+    resp = requests.post(API_URL + "/api/accounts/", json=data)
+    print(resp)
     return resp
 
 def get_account(username):
-    get_url = API_URL + "/api/accounts/" + str(username) + "/"
-    resp = client.get(get_url)
+    account_url = API_URL + "/api/accounts/" + str(username) + "/"
+    resp = requests.get(account_url)
     acc_body = resp.json()
+    pfolio_url = acc_body["@controls"]["portfolio"]["href"]
+    print(pfolio_url)
+    #resp = requests.get(pfolio_url)
+    #print(resp)
+    #pfolio_body = resp.json()
+    #print("ACCOUNT:")
+    #print("Name: " + str(acc_body["name"]))
+    #print("Portfolio value: " + str(pfolio_body["value"]))
 
-    pfolio = body["@controls"]["portfolio"]["href"]
-    resp = client.get(get_url)
-    pfolio_body = resp.json()
-
-    print("ACCOUNT:")
-    print("Name: " + str(acc_body["name"]))
-    print("Portfolio value: " + str(pfolio_body["value"]))
-
-    return acc_body, pfolio_body
+    #return acc_body, pfolio_body
 
 def put_account(username, new_username, passwd):
     information = get_account_json(new_username, passwd)
-    resp = client.put(API_URL + "/api/accounts/", data=json.dumps(information))
+    resp = requests.put(API_URL + "/api/accounts/", data=json.dumps(information))
     return resp
 
 def delete_account(username):
@@ -141,5 +145,11 @@ def submit_data(s, ctrl, data):
     return resp
 
 #Run the application
-main()
+#main()
+#get_all_accounts()
+#post_account()
+#login()
+get_account("test-account-1")
+
+
 
