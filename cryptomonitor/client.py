@@ -39,46 +39,63 @@ def login():
 
 
 
-
+###############################
 ### ACCOUNT related methods ###
+###############################
 
 def get_all_accounts():
-    """Requests and prints a list of all Accounts"""
+    """ Requests and prints a list of all Accounts"""
     resp = requests.get(API_URL + "/api/accounts/")
-    body = resp.json()
-    print("\nACCOUNTS:\n")
-    for item in body["items"]:
-        print("ID: "+str(item["id"]))
-        print("Name: "+str(item["name"]))
-        print("Password: "+str(item["password"]))
-        print("Portfolio-ID: "+str(item["portfolio_id"]))
-        print("")
+    if(resp.status_code == 200):
+        body = resp.json()
+        print("\nACCOUNTS:\n")
+        for item in body["items"]:
+            print("ID: "+str(item["id"]))
+            print("Name: "+ item["name"])
+            print("Password: " + item["password"])
+            print("Portfolio-ID: "+str(item["portfolio_id"]) + "\n")
+    else:
+        print("Bad response")
     return resp
 
-def post_account():
+def post_account(name, password):
+    """
+    Posts a new account to database.
+    : param name: name for the account
+    : param password: password for the account
+    return: API's response to post try.
+    """
     print("ADD A NEW ACCOUNT")
     data = {}
-    name = input("Type account name: ")
-    pswd = input("Type password: ")
     data["name"] = name
-    data["password"] = pswd
-    print(data)
+    data["password"] = password
     resp = requests.post(API_URL + "/api/accounts/", json=data)
-    print(resp)
+    if(resp.status_code != 201):
+        print("Bad response")
+    else:
+        print("Account added succesfully.")
     return resp
 
 def get_account(username):
+    """
+    Prints given account's information.
+    : param username: name of the printable account
+    return: API's response.
+    """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
-    resp = requests.get(account_url)
-    acc_body = resp.json()
-    pfolio_url = acc_body["@controls"]["portfolio"]["href"]
-    resp = requests.get(API_URL + pfolio_url)
-    pfolio_body = resp.json()
-    print("ACCOUNT:")
-    print("Name: " + str(acc_body["name"]))
-    print("Portfolio value: " + str(pfolio_body["value"]))
-
-    return acc_body, pfolio_body
+    acc_resp = requests.get(account_url)
+    if(acc_resp.status_code == 200):
+        acc_body = acc_resp.json()
+        pfolio_url = acc_body["@controls"]["portfolio"]["href"]
+        pfolio_resp = requests.get(API_URL + pfolio_url)
+        pfolio_body = pfolio_resp.json()
+        print("ACCOUNT INFO:")
+        print("ID: "+str(acc_body["id"]))
+        print("Name: "+str(acc_body["name"]))
+        #print("Password: "+str(acc_body["password"]))      #PASSWORD NOT SHOWN?
+        print("Portfolio-ID: "+str(acc_body["portfolio_id"]))
+        print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
+    return acc_resp
 
 def put_account(username, new_username, passwd):
     information = get_account_json(new_username, passwd)
@@ -90,15 +107,19 @@ def delete_account(username):
     resp = client.delete(delete_url)
     return resp
 
+
+
+#################################
 ### Portfolio related methods ###
+#################################
 def get_portfolio(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
     resp = client.get(get_url)
     return resp
     
 
-### PCurrency related methods ###
 def get_all_pcurrencies(useraccount):
+
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
     resp = client.get(get_url)
     body = json.loads(resp.data)
@@ -109,18 +130,52 @@ def get_all_pcurrencies(useraccount):
 def post_pcurrency():
     pass
 
-
-
+######################################
 ### CryptoCurrency related methods ###
-
-def get_cryptocurrencies():
-    return client.get(API_URL + "/api/currencies/")
+######################################
+def get_all_cryptocurrencies():
+    """ 
+    Print all cryptocurrencies known by the API.
+    return: API's response.
+    """
+    resp = requests.get(API_URL + "/api/currencies/")
+    if(resp.status_code == 200):
+        body = resp.json()
+        print("CRYPTOCURRENCIES:\n")
+        for ccurrency in body["items"]:
+            print("Currency: " + ccurrency["name"])
+            print("Abbreviation: " + ccurrency["abbreviation"])
+            print("Timestamp: " + ccurrency["timestamp"])
+            print("Value: " + str(ccurrency["value"]))
+            print("Daily growth: " + str(ccurrency["daily_growth"]) + "\n")
+    else:
+        print("Bad response")
+    return resp
 
 def get_cryptocurrency(abbreviation):
-    currency_url = (API_URL + "/api/currencies/" + str(abbrevation).lower() + "/")
-    return client.get(currency_url) 
+    """ 
+    Print all cryptocurrencies known by the API.
+    : param abbreviation: abbreviation of currency.
+    return: API's response.
+    """
+    currency_url = (API_URL + "/api/currencies/" + str(abbreviation).lower() + "/")
+    resp = requests.get(currency_url)
+    if(resp.status_code == 200):
+        body = resp.json()
+        print("CRYPTOCURRENCY INFO:\n")
+        print("Currency: " + body["name"])
+        print("Abbreviation: " + body["abbreviation"])
+        print("Timestamp: " + body["timestamp"])
+        print("Value: " + str(body["value"]))
+        print("Daily growth: " + str(body["daily_growth"]) + "\n")
+    else:
+        print("Bad response")
+    return resp 
 
 
+
+
+#OTHER METHODS
 def convert_value(value, schema_props):
     if schema_props["type"] == "number":
         try:
@@ -142,12 +197,14 @@ def submit_data(s, ctrl, data):
     )
     return resp
 
-#Run the application
-#main()
+
+### TESTING FUNCTIONS ###
+
 #get_all_accounts()
-#post_account()
-#login()
-get_account("test-account-1")
+#post_account("test-account-7", "pswd7")
+#get_account("test-account-1")
+#get_all_cryptocurrencies()
+#get_cryptocurrency("ETh")
 
 
 
