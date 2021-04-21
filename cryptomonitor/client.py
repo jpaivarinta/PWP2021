@@ -118,18 +118,39 @@ def get_portfolio(username):
     return resp
     
 
-def get_all_pcurrencies(useraccount):
+def get_all_pcurrencies(username):
 
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
-    resp = client.get(get_url)
-    body = json.loads(resp.data)
-#    for item in body["items"]:
-#        print(item[""])
+    resp = requests.get(get_url)
+    body = resp.json()
+    for item in body["items"]:
+       print(item)
     return resp
 
-def post_pcurrency():
-    pass
+def post_pcurrency(username, currency_abbreviation, currency_amount):
+    currency_abbreviation = currency_abbreviation.upper()
+    pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/".format(API_URL, username)
+    pcurrency_body = {"currencyname": "{}".format(currency_abbreviation), "currencyamount": "{}".format(currency_amount)}
+    # send post requests
+    resp = requests.post(pcurrency_url, json=pcurrency_body)
+    if resp.status_code == 201:
+        print("Currency added to portfolio")
+    else:
+        print("Bad response")
 
+def put_pcurrency(username, currency_abbreviation, currency_amount):
+    """
+    TODO: @Sami fix this!!!
+    Returns:
+        object:
+    """
+    pcurrency_url = "{}/api/accounts/portfolio/pcurrencies/{}/".format(API_URL,username,currency_abbreviation.upper())
+    pcurrency_json = get_pcurrency_json(currency_abbreviation, currency_amount)
+    resp = requests.put(pcurrency_url, json=pcurrency_json)
+    if resp.status_code==204:
+        print("Currency amount updated")
+    else:
+        print("Bad response")
 ######################################
 ### CryptoCurrency related methods ###
 ######################################
@@ -158,7 +179,7 @@ def get_cryptocurrency(abbreviation):
     : param abbreviation: abbreviation of currency.
     return: API's response.
     """
-    currency_url = (API_URL + "/api/currencies/" + str(abbreviation).lower() + "/")
+    currency_url = (API_URL + "/api/currencies/" + str(abbreviation).upper() + "/")
     resp = requests.get(currency_url)
     if(resp.status_code == 200):
         body = resp.json()
@@ -197,7 +218,9 @@ def submit_data(s, ctrl, data):
     )
     return resp
 
-
+# HELPER FUNCTIONS
+def get_pcurrency_json(abbreviation, amount):
+    return {"currencyname:{}".format(abbreviation.upper()), "currencyamount:{}".format(amount)}
 ### TESTING FUNCTIONS ###
 
 #get_all_accounts()
@@ -205,6 +228,8 @@ def submit_data(s, ctrl, data):
 #get_account("test-account-1")
 #get_all_cryptocurrencies()
 #get_cryptocurrency("ETh")
-
-
+# post_pcurrency("test-account-1", "eth", 2000.111)
+get_all_pcurrencies("test-account-1")
+# put_pcurrency("test-account-1", "eth", 2.3)
+get_all_pcurrencies("test-account-1")
 
