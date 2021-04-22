@@ -8,6 +8,23 @@ API_URL = "http://127.0.0.1:5000"
 def main():
 	start_menu()
 
+def main_menu():
+    while True:
+        print("(C) List of cryptocurrencies")
+        print("(P) Portfolio")
+        print("(A) Account")
+        print("(L) Log out")
+        choice = input("Choose C, P, A or L: ").lower()
+        if choice == "c":
+            print("Crpytocurrencies chosen")
+        elif choice == "p":
+            print("Portfolio chosen")
+        elif choice == "a":
+            print("Account chosen")
+        elif choice == "l":
+            print("Logging out")
+        else:
+            input("Invalid input, press anything to continue: ")
 
 def start_menu():
     print("*** CryptoMonitoring API Client ***")
@@ -19,13 +36,13 @@ def start_menu():
         choice = input("Type L, R or Q: ")
         choice = choice.lower()
 
-        if(choice == "l" or choice == "login"):
+        if choice == "l" or choice == "login":
             print("Login chosen\n")
             return "LOGIN"
-        elif(choice == "r" or choice == "register"):
+        elif choice == "r" or choice == "register":
             print("Register chosen\n")
             return "REGISTER"
-        elif(choice == "q" or choice == "quit"):
+        elif choice == "q" or choice == "quit":
             print("Quit chosen, terminating app.")
             sys.exit()
         else:
@@ -33,9 +50,99 @@ def start_menu():
             continue
 
 def login():
-    account = input("Accountname: ")
-    password = input("Password: ")
-    # resp = Re
+    accounts = get_all_accounts()
+    if accounts.status_code == 200:
+        body = accounts.json()
+        while True:
+            username = input("Username: ")
+            for item in body["items"]:
+                if username == item:
+                    break
+            print("Username not found")
+        while True:
+            password = input("Password: ")
+            if password == item["password"]:
+                break
+            print("Invalid password")
+    else:
+        print("Bad response")
+    
+    #what now?
+
+def register():
+    accounts = get_all_accounts()
+    if accounts.status_code == 200:
+        body = accounts.json()
+        while True:
+            username = input("Give your account an username: ")
+            for item in body["items"]:
+                if username == item:
+                    print("Username already taken")
+                    continue
+            break
+        while True:
+            password = input("Give your account a password: ")
+            password2 = input("Retype the password: ")
+            if password == password2:
+                break
+            print("Passwords did not match")
+        post_account(username, password)
+        start_menu()
+    else:
+        print("Bad response")
+
+def cryptocurrency_menu():
+    cryptocurrencies = get_all_cryptocurrencies()
+    if cryptocurrencies.status_code == 200:
+        body = cryptocurrencies.json()
+        print("CRYPTOCURRENCIES:\n")
+        for ccurrency in body["items"]:
+            print("Currency: " + ccurrency["name"] + "|" + "Abbreviation: " + ccurrency["abbreviation"])
+    else:
+        print("Bad response")
+        return
+
+    while True:
+        abbr = input("Type abbreviation of cryptocurrency for more information, or 'exit' to return: ").lower()
+        if(abbr == "exit"):
+            return
+        cryptocurrency = get_cryptocurrency(abbr)
+        if cryptocurrency.status_code == 200:
+            cbody = cryptocurrency.json()
+            print("Currency: " + cryptocurrency["name"])
+            print("Abbreviation: " + cryptocurrency["abbreviation"])
+            print("Timestamp: " + cryptocurrency["timestamp"])
+            print("Value: " + str(cryptocurrency["value"]))
+            print("Daily growth: " + str(cryptocurrency["daily_growth"]))
+
+
+def portfolio_menu():
+    pass
+
+def account_menu(username):
+    account = get_account(username)
+    if account.status_code == 200:
+        body = account.json()
+        print("Name: " + item["name"])
+        # Some information about portfolio?
+        while True:
+            print("(E) Edit account")
+            print("(D) Delete account")
+            choice = input("Choose E or D: ").lower()
+            if choice == "e":
+                pass
+            elif choice == "d":
+                while True:
+                    yorn = input("Are you sure you want to delete account? Y or N: ").lower
+                    if yorn == "y":
+                        resp = delete_account(username)
+                        #log out?
+                    elif yorn == "n":
+                        break
+                    else:
+                        print("Invalid input.")
+            else:
+                input("Invalid input. Press anything to continue: ")
 
 
 
@@ -50,10 +157,10 @@ def get_all_accounts():
         body = resp.json()
         print("\nACCOUNTS:\n")
         for item in body["items"]:
-            print("ID: "+str(item["id"]))
-            print("Name: "+ item["name"])
+            print("ID: " + str(item["id"]))
+            print("Name: " + item["name"])
             print("Password: " + item["password"])
-            print("Portfolio-ID: "+str(item["portfolio_id"]) + "\n")
+            print("Portfolio-ID: " + str(item["portfolio_id"]) + "\n")
     else:
         print("Bad response")
     return resp
@@ -90,7 +197,7 @@ def get_account(username):
         pfolio_resp = requests.get(API_URL + pfolio_url)
         pfolio_body = pfolio_resp.json()
         print("ACCOUNT INFO:")
-        print("ID: "+str(acc_body["id"]))
+        #print("ID: "+str(acc_body["id"])) # I think ID should not be shown
         print("Name: "+str(acc_body["name"]))
         #print("Password: "+str(acc_body["password"]))      #PASSWORD NOT SHOWN?
         print("Portfolio-ID: "+str(acc_body["portfolio_id"]))
@@ -119,7 +226,7 @@ def get_portfolio(username):
     
 
 def get_all_pcurrencies(username):
-
+    
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
     resp = requests.get(get_url)
     body = resp.json()
@@ -160,17 +267,17 @@ def get_all_cryptocurrencies():
     return: API's response.
     """
     resp = requests.get(API_URL + "/api/currencies/")
-    if(resp.status_code == 200):
-        body = resp.json()
-        print("CRYPTOCURRENCIES:\n")
-        for ccurrency in body["items"]:
-            print("Currency: " + ccurrency["name"])
-            print("Abbreviation: " + ccurrency["abbreviation"])
-            print("Timestamp: " + ccurrency["timestamp"])
-            print("Value: " + str(ccurrency["value"]))
-            print("Daily growth: " + str(ccurrency["daily_growth"]) + "\n")
-    else:
-        print("Bad response")
+    #if(resp.status_code == 200):
+    #    body = resp.json()
+    #    print("CRYPTOCURRENCIES:\n")
+    #    for ccurrency in body["items"]:
+    #        print("Currency: " + ccurrency["name"])
+    #        print("Abbreviation: " + ccurrency["abbreviation"])
+    #        print("Timestamp: " + ccurrency["timestamp"])
+    #        print("Value: " + str(ccurrency["value"]))
+    #        print("Daily growth: " + str(ccurrency["daily_growth"]) + "\n")
+    #else:
+    #    print("Bad response")
     return resp
 
 def get_cryptocurrency(abbreviation):
@@ -229,7 +336,7 @@ def get_pcurrency_json(abbreviation, amount):
 #get_all_cryptocurrencies()
 #get_cryptocurrency("ETh")
 # post_pcurrency("test-account-1", "eth", 2000.111)
-get_all_pcurrencies("test-account-1")
+#get_all_pcurrencies("test-account-1")
 # put_pcurrency("test-account-1", "eth", 2.3)
-get_all_pcurrencies("test-account-1")
-
+#get_all_pcurrencies("test-account-1")
+#main_menu()
