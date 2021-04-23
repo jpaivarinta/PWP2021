@@ -271,11 +271,6 @@ def post_pcurrency(username, currency_abbreviation, currency_amount):
         print("Bad response")
 
 def put_pcurrency(username, currency_abbreviation, currency_amount):
-    """
-    TODO: @Sami fix this!!!
-    Returns:
-        object:
-    """
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL,username,currency_abbreviation.upper())
     pcurrency_json = get_pcurrency_json(currency_abbreviation, currency_amount)
     resp = requests.put(pcurrency_url, json=pcurrency_json)
@@ -283,6 +278,15 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
         print("Currency amount updated")
     else:
         print("Bad response")
+
+def delete_pcurrency(username, currency_abbreviation):
+    pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username, currency_abbreviation.upper())
+    resp = requests.delete(pcurrency_url)
+    if resp.status_code == 204:
+        print("Currency {} removed from portfolio".format(currency_abbreviation))
+    else:
+        print("Bad response")
+
 ######################################
 ### CryptoCurrency related methods ###
 ######################################
@@ -362,11 +366,12 @@ def get_pcurrency_json(abbreviation, amount):
 #get_all_cryptocurrencies()
 #get_cryptocurrency("ETh")
 # post_pcurrency("test-account-1", "eth", 2000.111)
-#get_all_pcurrencies("test-account-1")
-put_pcurrency("test-account-1", "eth", 2.3)
-get_all_pcurrencies("test-account-1")
+# get_all_pcurrencies("test-account-1")
+# put_pcurrency("test-account-1", "eth", 2.3)
+# delete_pcurrency("test-account-1", "btc")
+# get_all_pcurrencies("test-account-1")
 #main_menu()
 
-# while True:
-#     start_menu()
-#     main_menu()
+while True:
+    start_menu()
+    main_menu()
