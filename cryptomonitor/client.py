@@ -276,7 +276,7 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
     Returns:
         object:
     """
-    pcurrency_url = "{}/api/accounts/portfolio/pcurrencies/{}/".format(API_URL,username,currency_abbreviation.upper())
+    pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL,username,currency_abbreviation.upper())
     pcurrency_json = get_pcurrency_json(currency_abbreviation, currency_amount)
     resp = requests.put(pcurrency_url, json=pcurrency_json)
     if resp.status_code==204:
@@ -352,7 +352,7 @@ def submit_data(s, ctrl, data):
 
 # HELPER FUNCTIONS
 def get_pcurrency_json(abbreviation, amount):
-    return {"currencyname:{}".format(abbreviation.upper()), "currencyamount:{}".format(amount)}
+    return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":"{}".format(amount)}
 
 ### TESTING FUNCTIONS ###
 
@@ -363,10 +363,10 @@ def get_pcurrency_json(abbreviation, amount):
 #get_cryptocurrency("ETh")
 # post_pcurrency("test-account-1", "eth", 2000.111)
 #get_all_pcurrencies("test-account-1")
-# put_pcurrency("test-account-1", "eth", 2.3)
-#get_all_pcurrencies("test-account-1")
+put_pcurrency("test-account-1", "eth", 2.3)
+get_all_pcurrencies("test-account-1")
 #main_menu()
 
-while True:
-    start_menu()
-    main_menu()
+# while True:
+#     start_menu()
+#     main_menu()
