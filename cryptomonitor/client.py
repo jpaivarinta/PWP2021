@@ -7,33 +7,11 @@ import msvcrt
 API_URL = "http://127.0.0.1:5000"
 
 
-
-def main_menu():
-    print("*** MAIN MENU ***\n")
-    while True:
-        print("(C) List of cryptocurrencies")
-        print("(P) Portfolio")
-        print("(A) Account")
-        print("(L) Log out")
-        choice = input("Choose C, P, A or L: ").lower()
-        if choice == "c":
-            print("Cryptocurrencies chosen")
-            get_all_cryptocurrencies()
-        elif choice == "p":
-            print("Portfolio chosen")
-        elif choice == "a":
-            print("Account chosen")
-        elif choice == "l":
-            print("Logging out")
-            logged_in = False
-            return
-        else:
-            print("invalid input, Try again\n")
-
 def start_menu():
-    print("*** CryptoMonitoring API Client ***\nSTART MENU\n")
+    print("*** CryptoMonitoring API Client ***")
+    print("START MENU\n")
     while True:
-        print("Choose the functionality you want to use:\n")
+        print("Choose the functionality you want to use:")
         print("(L) Login")
         print("(R) Register")
         print("(Q) Quit")
@@ -61,7 +39,8 @@ def login():
     """
     Implements Login-functionality
     """
-    global logged_in
+    global logged_in, username
+    username = ""
     logged_in = False
     accounts = get_all_accounts()
     if accounts.status_code == 200:
@@ -86,13 +65,12 @@ def login():
                 break
             print("Invalid password")
             attempts += 1
-        print("Login succesful.\n")
+        print("Login successful.\n")
         logged_in = True
         return
     else:
         print("Bad response")
         return
-
 
 def register():
     accounts = get_all_accounts()
@@ -116,6 +94,32 @@ def register():
     else:
         print("Bad response")
 
+def main_menu():
+    print("*** MAIN MENU ***\n")
+    while True:
+        print("Choose the functionality you want to use:")
+        print("(C) Cryptocurrencies")
+        print("(P) Portfolio")
+        print("(A) Account")
+        print("(L) Log out")
+        choice = input("Choose C, P, A or L: ").lower()
+
+        if choice == "c":
+            print("Cryptocurrencies chosen")
+            get_all_cryptocurrencies()
+        elif choice == "p":
+            print("Portfolio chosen")
+            portfolio_menu()
+        elif choice == "a":
+            print("Account chosen")
+            account_menu(username)
+        elif choice == "l":
+            print("Logging out")
+            logged_in = False
+            start_menu()
+        else:
+            print("invalid input, Try again\n")
+
 def cryptocurrency_menu():
     cryptocurrencies = get_all_cryptocurrencies()
     if cryptocurrencies.status_code == 200:
@@ -129,7 +133,7 @@ def cryptocurrency_menu():
 
     while True:
         abbr = input("Type abbreviation of cryptocurrency for more information, or 'exit' to return: ").lower()
-        if(abbr == "exit"):
+        if abbr == "exit":
             return
         cryptocurrency = get_cryptocurrency(abbr)
         if cryptocurrency.status_code == 200:
@@ -142,34 +146,38 @@ def cryptocurrency_menu():
 
 
 def portfolio_menu():
-    pass
+    print("\nPORTFOLIO INFORMATION:\n")
+    get_portfolio(username)
+
 
 def account_menu(username):
     account = get_account(username)
     if account.status_code == 200:
         body = account.json()
-        print("Name: " + item["name"])
-        # Some information about portfolio?
         while True:
             print("(E) Edit account")
             print("(D) Delete account")
-            choice = input("Choose E or D: ").lower()
+            print("(M) Main menu")
+            choice = input("Choose E, D or M: ")
+            choice = choice.lower()
             if choice == "e":
                 pass
             elif choice == "d":
                 while True:
-                    yorn = input("Are you sure you want to delete account? Y or N: ").lower
-                    if yorn == "y":
+                    confirm = input("Are you sure you want to delete account? Y or N: ")
+                    confirm = confirm.lower()
+                    if confirm == "y":
                         resp = delete_account(username)
-                        #log out?
-                    elif yorn == "n":
+                        logged_in = False
+                        return 
+                    elif confirm == "n":
                         break
                     else:
                         print("Invalid input.")
+            elif choice == "m":
+                main_menu()
             else:
                 input("Invalid input. Press anything to continue: ")
-
-
 
 ###############################
 ### ACCOUNT related methods ###
@@ -178,7 +186,7 @@ def account_menu(username):
 def get_all_accounts():
     """ Requests and prints a list of all Accounts"""
     resp = requests.get(API_URL + "/api/accounts/")
-    if(resp.status_code == 200):
+    if resp.status_code == 200:
         body = resp.json()
         """
         print("\nACCOUNTS:\n")
@@ -204,10 +212,10 @@ def post_account(name, password):
     data["name"] = name
     data["password"] = password
     resp = requests.post(API_URL + "/api/accounts/", json=data)
-    if(resp.status_code != 201):
+    if resp.status_code != 201:
         print("Bad response")
     else:
-        print("Account added succesfully.")
+        print("Account added successfully.")
     return resp
 
 def get_account(username):
@@ -218,7 +226,7 @@ def get_account(username):
     """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
     acc_resp = requests.get(account_url)
-    if(acc_resp.status_code == 200):
+    if acc_resp.status_code == 200:
         acc_body = acc_resp.json()
         pfolio_url = acc_body["@controls"]["portfolio"]["href"]
         pfolio_resp = requests.get(API_URL + pfolio_url)
@@ -236,7 +244,7 @@ def put_account(username, new_username, passwd):
 
 def delete_account(username):
     delete_url = API_URL + "/api/accounts/" + str(username) + "/"
-    resp = client.delete(delete_url)
+    resp = requests.delete(delete_url)
     return resp
 
 
@@ -246,17 +254,28 @@ def delete_account(username):
 #################################
 def get_portfolio(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
-    resp = client.get(get_url)
+    resp = requests.get(get_url)
+    if resp.status_code == 200:
+        body = resp.json()
+        print("Total value: " + str(body["value"]))
+        print("Timestamp: " + str(body["timestamp"]))
+        print("Cryptocurrencies included: \n")
+        get_all_pcurrencies(username)
+    else:
+        print("Bad response")
     return resp
     
 
 def get_all_pcurrencies(username):
-    
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
     resp = requests.get(get_url)
-    body = resp.json()
-    for item in body["items"]:
-       print(item)
+    if resp.status_code == 200:
+        body = resp.json()
+        for item in body["items"]:
+            print("Cryptocurrency: "+ item["currencyname"])
+            print("Amount: " + str(item["currencyamount"]) + "\n")
+    else:
+        print("Bad response")
     return resp
 
 def post_pcurrency(username, currency_abbreviation, currency_amount):
@@ -283,6 +302,8 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
         print("Currency amount updated")
     else:
         print("Bad response")
+
+
 ######################################
 ### CryptoCurrency related methods ###
 ######################################
@@ -292,7 +313,7 @@ def get_all_cryptocurrencies():
     return: API's response.
     """
     resp = requests.get(API_URL + "/api/currencies/")
-    if(resp.status_code == 200):
+    if resp.status_code == 200:
         body = resp.json()
         print("CRYPTOCURRENCIES:\n")
         for ccurrency in body["items"]:
@@ -313,7 +334,7 @@ def get_cryptocurrency(abbreviation):
     """
     currency_url = (API_URL + "/api/currencies/" + str(abbreviation).upper() + "/")
     resp = requests.get(currency_url)
-    if(resp.status_code == 200):
+    if resp.status_code == 200:
         body = resp.json()
         print("CRYPTOCURRENCY INFO:\n")
         print("Currency: " + body["name"])
@@ -363,10 +384,11 @@ def get_pcurrency_json(abbreviation, amount):
 #get_cryptocurrency("ETh")
 # post_pcurrency("test-account-1", "eth", 2000.111)
 #get_all_pcurrencies("test-account-1")
-put_pcurrency("test-account-1", "eth", 2.3)
-get_all_pcurrencies("test-account-1")
+#put_pcurrency("test-account-1", "eth", 2.3)
+#get_all_pcurrencies("test-account-1")
 #main_menu()
+#get_portfolio("test-account-2")
 
-# while True:
-#     start_menu()
-#     main_menu()
+while True:
+    start_menu()
+    main_menu()
