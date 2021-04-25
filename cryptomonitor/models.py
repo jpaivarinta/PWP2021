@@ -129,18 +129,22 @@ def generate_test_data():
     a2.portfolio = p2
 
     c1 = CryptoCurrency(
-        name = "Bitcoin",
-        abbreviation = "BTC",
-        timestamp = datetime.now(),
-        value = 50000.0,
-        daily_growth = 2.5
+        name="Bitcoin",
+        abbreviation="BTC",
+        timestamp=datetime.now(),
+        value=50000.00,
+        daily_growth=7.1,
+        launchDate=datetime(2012, 5, 12),
+        blockchain_length=3610463
     )
     c2 = CryptoCurrency(
         name = "Ethereum",
         abbreviation = "ETH",
         timestamp = datetime.now(),
         value = 1700.0,
-        daily_growth = 5.5
+        daily_growth = 5.5,
+        launchDate=datetime(1500, 5, 12),
+        blockchain_length=3610463
     )
 
     cp1 = crypto_portfolio(
