@@ -148,18 +148,64 @@ def cryptocurrency_menu():
         return
 
 def portfolio_menu():
-    print("\nPORTFOLIO INFORMATION:\n")
-    pfolio_resp = get_portfolio(username)
-    pc_resp = get_all_pcurrencies(username)
-    if pfolio_resp.status_code == 200 and pc_resp.status_code == 200:
-        pfolio_body = pfolio_resp.json()
-        pc_body = pc_resp.json()
-        print("Total value: " + str(pfolio_body["value"]))
-        print("Timestamp: " + str(pfolio_body["timestamp"]))
-        print("Cryptocurrencies included:")
-        for pcurrency in pc_body["items"]:
-            print("Cryptocurrency: "+ pcurrency["currencyname"])
-            print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
+    while True:
+        print("\nPORTFOLIO INFORMATION:\n")
+        pfolio_resp = get_portfolio(username)
+        pc_resp = get_all_pcurrencies(username)
+        if pfolio_resp.status_code == 200 and pc_resp.status_code == 200:
+            pfolio_body = pfolio_resp.json()
+            pc_body = pc_resp.json()
+            print("Total value: " + str(pfolio_body["value"]))
+            print("Timestamp: " + str(pfolio_body["timestamp"]))
+            print("Cryptocurrencies included:")
+            for pcurrency in pc_body["items"]:
+                print("Cryptocurrency: "+ pcurrency["currencyname"])
+                print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
+        while True:
+            print("(E) Edit portfolio")
+            print("(R) Return")
+            choice = input("Choose E or R: ").lower()
+            if choice == 'r':
+                return
+            elif choice == 'e':
+                pcurrency_menu()
+            else:
+                input("Invalid input. Press anything to continue: ")
+    
+def pcurrency_menu():
+    print("(A) Add cryptocurrency to portfolio")
+    print("(E) Edit cryptocurrency amount")
+    print("(D) Delete cryptocurrency from portfolio")
+    print("(R) Return")
+    while True:
+        choice = input("Choose A, E, D or R: ").lower()
+        if choice == 'a':
+            abbr = input("Give abbreviation of cryptocurrency: ").lower()
+            ccurrency = get_cryptocurrency(abbr)
+            if ccurrency.status_code == 200: # Checks if cryptocurrency exists
+                amount = input("Give amount of cryptocurrency: ") # Should this be float or string?
+                post_pcurrency(username, abbr, amount)
+            else:
+                print("Cryptocurrency doesn't exist")
+        elif choice == 'e':
+            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").lower()
+            pcurrency = get_pcurrency(username, abbr)
+            if pcurrency.status_code == 200:
+                new_amount = input("Give new amount: ")
+                put_pcurrency(username, abbr, new_amount)
+            else:
+                print("Cryptocurrency not found in the portfolio")
+        elif choice == 'd':
+            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").lower()
+            resp = delete_pcurrency(username, abbr)
+            if resp.status_code == 204:
+                print("Cryptocurrency has been removed from portfolio")
+            else:
+                print("Cryptocurrency not found in the portfolio")
+        elif choice == 'r':
+            return
+        else:
+            input("Invalid input. Press anything to continue: ")
 
 def account_menu(username):
     account = get_account(username)
@@ -260,7 +306,10 @@ def get_portfolio(username):
         print("Bad response")
     return resp
 
-    
+def get_pcurrency(username, abbr):
+    get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr) + "/"
+    resp = requests.get(get_url)
+    return resp
 
 def get_all_pcurrencies(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
@@ -292,11 +341,11 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
 def delete_pcurrency(username, currency_abbreviation):
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username, currency_abbreviation.upper())
     resp = requests.delete(pcurrency_url)
-    if resp.status_code == 204:
-        print("Currency {} removed from portfolio".format(currency_abbreviation))
-    else:
-        print("Bad response")
-
+    #if resp.status_code == 204:
+    #    print("Currency {} removed from portfolio".format(currency_abbreviation))
+    #else:
+    #    print("Bad response")
+    return resp
 
 
 ###############################
@@ -349,3 +398,4 @@ def get_pcurrency_json(abbreviation, amount):
 while True:
     start_menu()
     main_menu()
+    #pcurrency_menu()
