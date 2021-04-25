@@ -6,35 +6,6 @@ import msvcrt
 
 API_URL = "http://127.0.0.1:5000"
 
-
-def start_menu():
-    print("*** CryptoMonitoring API Client ***")
-    print("START MENU\n")
-    while True:
-        print("Choose the functionality you want to use:")
-        print("(L) Login")
-        print("(R) Register")
-        print("(Q) Quit")
-        choice = input("Type L, R or Q: ")
-        choice = choice.lower()
-
-        if choice == "l" or choice == "login":
-            print("Login chosen\n")
-            login()
-            if logged_in == True:
-                break
-            else:
-                continue
-        elif choice == "r" or choice == "register":
-            print("Register chosen\n")
-            register()
-        elif choice == "q" or choice == "quit":
-            print("Quit chosen, terminating app.")
-            sys.exit()
-        else:
-            print("Invalid input, try again")
-            continue
-
 def login():
     """
     Implements Login-functionality
@@ -77,22 +48,54 @@ def register():
     if accounts.status_code == 200:
         body = accounts.json()
         while True:
+            taken = False
             username = input("Give your account an username: ")
             for item in body["items"]:
-                if username == item:
+                if username == item["name"]:
                     print("Username already taken")
-                    continue
-            break
-        while True:
+                    taken = True
+            if taken:
+                continue
             password = input("Give your account a password: ")
             password2 = input("Retype the password: ")
             if password == password2:
                 break
             print("Passwords did not match")
         post_account(username, password)
-        start_menu()
     else:
         print("Bad response")
+
+######################
+### MENU FUNCTIONS ###
+######################
+
+def start_menu():
+    print("*** CryptoMonitoring API Client ***")
+    print("START MENU\n")
+    while True:
+        print("Choose the functionality you want to use:")
+        print("(L) Login")
+        print("(R) Register")
+        print("(Q) Quit")
+        choice = input("Type L, R or Q: ")
+        choice = choice.lower()
+
+        if choice == "l" or choice == "login":
+            print("Login chosen\n")
+            login()
+            if logged_in == True:
+                break
+            else:
+                continue
+        elif choice == "r" or choice == "register":
+            print("Register chosen\n")
+            register()
+        elif choice == "q" or choice == "quit":
+            print("Quit chosen, terminating app.")
+            sys.exit()
+        else:
+            print("Invalid input, try again")
+            continue
 
 def main_menu():
     print("*** MAIN MENU ***\n")
@@ -106,7 +109,7 @@ def main_menu():
 
         if choice == "c":
             print("Cryptocurrencies chosen")
-            get_all_cryptocurrencies()
+            cryptocurrency_menu()
         elif choice == "p":
             print("Portfolio chosen")
             portfolio_menu()
@@ -121,28 +124,27 @@ def main_menu():
             print("invalid input, Try again\n")
 
 def cryptocurrency_menu():
-    cryptocurrencies = get_all_cryptocurrencies()
-    if cryptocurrencies.status_code == 200:
-        body = cryptocurrencies.json()
-        print("CRYPTOCURRENCIES:\n")
+    resp = get_all_cryptocurrencies()
+    if resp.status_code == 200:
+        body = resp.json()
+        print("\nCRYPTOCURRENCIES:\n")
         for ccurrency in body["items"]:
-            print("Currency: " + ccurrency["name"] + "|" + "Abbreviation: " + ccurrency["abbreviation"])
+            print(ccurrency["name"] + " | " + ccurrency["abbreviation"])
+        while True:
+            abbr = input("\nType abbreviation of cryptocurrency for more information, or 'exit' to return: ").lower()
+            if abbr == "exit":
+                return
+            cresp= get_cryptocurrency(abbr)
+            if cresp.status_code == 200:
+                cbody = cresp.json()
+                print("\nCurrency: " + cbody["name"])
+                print("Abbreviation: " + cbody["abbreviation"])
+                print("Timestamp: " + cbody["timestamp"])
+                print("Value: " + str(cbody["value"]))
+                print("Daily growth: " + str(cbody["daily_growth"]))
     else:
         print("Bad response")
         return
-
-    while True:
-        abbr = input("Type abbreviation of cryptocurrency for more information, or 'exit' to return: ").lower()
-        if abbr == "exit":
-            return
-        cryptocurrency = get_cryptocurrency(abbr)
-        if cryptocurrency.status_code == 200:
-            cbody = cryptocurrency.json()
-            print("Currency: " + cryptocurrency["name"])
-            print("Abbreviation: " + cryptocurrency["abbreviation"])
-            print("Timestamp: " + cryptocurrency["timestamp"])
-            print("Value: " + str(cryptocurrency["value"]))
-            print("Daily growth: " + str(cryptocurrency["daily_growth"]))
 
 
 def portfolio_menu():
@@ -153,6 +155,7 @@ def portfolio_menu():
 def account_menu(username):
     account = get_account(username)
     if account.status_code == 200:
+        print("\nACCOUNT INFORMATION\n")
         body = account.json()
         while True:
             print("(E) Edit account")
@@ -179,24 +182,16 @@ def account_menu(username):
             else:
                 input("Invalid input. Press anything to continue: ")
 
-###############################
-### ACCOUNT related methods ###
-###############################
+
+
+########################
+### ACCOUNT REQUESTS ###
+########################
 
 def get_all_accounts():
-    """ Requests and prints a list of all Accounts"""
+    """ Requests a list of all Accounts"""
     resp = requests.get(API_URL + "/api/accounts/")
-    if resp.status_code == 200:
-        body = resp.json()
-        """
-        print("\nACCOUNTS:\n")
-        for item in body["items"]:
-            print("ID: " + str(item["id"]))
-            print("Name: " + item["name"])
-            print("Password: " + item["password"])
-            print("Portfolio-ID: " + str(item["portfolio_id"]) + "\n")
-        """
-    else:
+    if resp.status_code != 200:
         print("Bad response")
     return resp
 
@@ -207,15 +202,12 @@ def post_account(name, password):
     : param password: password for the account
     return: API's response to post try.
     """
-    print("ADD A NEW ACCOUNT")
     data = {}
     data["name"] = name
     data["password"] = password
     resp = requests.post(API_URL + "/api/accounts/", json=data)
     if resp.status_code != 201:
         print("Bad response")
-    else:
-        print("Account added successfully.")
     return resp
 
 def get_account(username):
@@ -231,7 +223,6 @@ def get_account(username):
         pfolio_url = acc_body["@controls"]["portfolio"]["href"]
         pfolio_resp = requests.get(API_URL + pfolio_url)
         pfolio_body = pfolio_resp.json()
-        print("ACCOUNT INFO:")
         print("Name: "+str(acc_body["name"]))
         print("Portfolio-ID: "+str(acc_body["portfolio_id"]))
         print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
@@ -249,9 +240,10 @@ def delete_account(username):
 
 
 
-#################################
-### Portfolio related methods ###
-#################################
+##########################
+### PORTFOLIO REQUESTS ###
+##########################
+
 def get_portfolio(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
     resp = requests.get(get_url)
@@ -269,12 +261,7 @@ def get_portfolio(username):
 def get_all_pcurrencies(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
     resp = requests.get(get_url)
-    if resp.status_code == 200:
-        body = resp.json()
-        for item in body["items"]:
-            print("Cryptocurrency: "+ item["currencyname"])
-            print("Amount: " + str(item["currencyamount"]) + "\n")
-    else:
+    if resp.status_code != 200:
         print("Bad response")
     return resp
 
@@ -306,25 +293,19 @@ def delete_pcurrency(username, currency_abbreviation):
     else:
         print("Bad response")
 
-######################################
-### CryptoCurrency related methods ###
-######################################
+
+
+###############################
+### CRYPTOCURRENCY REQUESTS ###
+###############################
+
 def get_all_cryptocurrencies():
     """ 
     Print all cryptocurrencies known by the API.
     return: API's response.
     """
     resp = requests.get(API_URL + "/api/currencies/")
-    if resp.status_code == 200:
-        body = resp.json()
-        print("CRYPTOCURRENCIES:\n")
-        for ccurrency in body["items"]:
-            print("Currency: " + ccurrency["name"])
-            print("Abbreviation: " + ccurrency["abbreviation"])
-            print("Timestamp: " + ccurrency["timestamp"])
-            print("Value: " + str(ccurrency["value"]))
-            print("Daily growth: " + str(ccurrency["daily_growth"]) + "\n")
-    else:
+    if resp.status_code != 200:
         print("Bad response")
     return resp
 
@@ -336,42 +317,11 @@ def get_cryptocurrency(abbreviation):
     """
     currency_url = (API_URL + "/api/currencies/" + str(abbreviation).upper() + "/")
     resp = requests.get(currency_url)
-    if resp.status_code == 200:
-        body = resp.json()
-        print("CRYPTOCURRENCY INFO:\n")
-        print("Currency: " + body["name"])
-        print("Abbreviation: " + body["abbreviation"])
-        print("Timestamp: " + body["timestamp"])
-        print("Value: " + str(body["value"]))
-        print("Daily growth: " + str(body["daily_growth"]) + "\n")
-    else:
+    if resp.status_code != 200:
         print("Bad response")
     return resp 
 
 
-
-
-#OTHER METHODS
-def convert_value(value, schema_props):
-    if schema_props["type"] == "number":
-        try:
-            value = int(value)
-        except ValueError:
-            value = float(value)
-    if schema_props["type"] == "integer":
-        value = int(value)
-    if schema_props["type"] == "string":
-        value = str(value)
-    return value
-
-def submit_data(s, ctrl, data):
-    resp = s.request(
-        ctrl["method"],
-        "" + ctrl["href"],
-        data=json.dumps(data),
-        headers = {"Content-type": "application/json"}
-    )
-    return resp
 
 # HELPER FUNCTIONS
 def get_pcurrency_json(abbreviation, amount):
