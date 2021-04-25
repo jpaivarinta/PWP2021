@@ -83,7 +83,7 @@ def _get_pcurrency_json(name, amount):
 	Returns:
 	Portfoliocurrency object
 	"""
-	return {"currencyname": "{}".format(name), "currencyamount": "{}".format(amount)}
+	return {"currencyname": "{}".format(name), "currencyamount": float(amount)}
 
 
 def _get_account_json(name, password):

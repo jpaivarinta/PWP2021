@@ -322,7 +322,7 @@ def get_all_pcurrencies(username):
 def post_pcurrency(username, currency_abbreviation, currency_amount):
     currency_abbreviation = currency_abbreviation.upper()
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/".format(API_URL, username)
-    pcurrency_body = {"currencyname": "{}".format(currency_abbreviation), "currencyamount": "{}".format(currency_amount)}
+    pcurrency_body = {"currencyname": "{}".format(currency_abbreviation), "currencyamount": float(currency_amount)}
     # send post requests
     resp = requests.post(pcurrency_url, json=pcurrency_body)
     if resp.status_code == 201:
@@ -379,7 +379,7 @@ def get_cryptocurrency(abbreviation):
 
 # HELPER FUNCTIONS
 def get_pcurrency_json(abbreviation, amount):
-    return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":"{}".format(amount)}
+    return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":float(amount)}
 
 ### TESTING FUNCTIONS ###
 
@@ -399,12 +399,12 @@ def get_pcurrency_json(abbreviation, amount):
 #while True:
 #   start_menu()
 #    main_menu()
-# resp = get_pcurrency("test-account-2", "eth")
+resp = get_pcurrency("test-account-2", "eth")
 # print(resp)
 #print(resp.json())
 
 
 
 resp = get_all_pcurrencies("test-account-2")
-print(resp.json())
+# print(resp.json())
 
