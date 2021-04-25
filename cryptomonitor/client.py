@@ -19,10 +19,11 @@ def login():
         attempts = 0
         while True:
             found = False
-            username = input("Username: ")
+            name_input = input("Username: ")
             for item in body["items"]:
-                if username == item["name"]:
+                if name_input == item["name"]:
                     found = True
+                    username = name_input
                     break
             if found == True:
                 break
@@ -119,7 +120,7 @@ def main_menu():
         elif choice == "l":
             print("Logging out")
             logged_in = False
-            start_menu()
+            return
         else:
             print("invalid input, Try again\n")
 
@@ -146,11 +147,19 @@ def cryptocurrency_menu():
         print("Bad response")
         return
 
-
 def portfolio_menu():
     print("\nPORTFOLIO INFORMATION:\n")
-    get_portfolio(username)
-
+    pfolio_resp = get_portfolio(username)
+    pc_resp = get_all_pcurrencies(username)
+    if pfolio_resp.status_code == 200 and pc_resp.status_code == 200:
+        pfolio_body = pfolio_resp.json()
+        pc_body = pc_resp.json()
+        print("Total value: " + str(pfolio_body["value"]))
+        print("Timestamp: " + str(pfolio_body["timestamp"]))
+        print("Cryptocurrencies included:")
+        for pcurrency in pc_body["items"]:
+            print("Cryptocurrency: "+ pcurrency["currencyname"])
+            print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
 
 def account_menu(username):
     account = get_account(username)
@@ -247,15 +256,10 @@ def delete_account(username):
 def get_portfolio(username):
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
     resp = requests.get(get_url)
-    if resp.status_code == 200:
-        body = resp.json()
-        print("Total value: " + str(body["value"]))
-        print("Timestamp: " + str(body["timestamp"]))
-        print("Cryptocurrencies included: \n")
-        get_all_pcurrencies(username)
-    else:
+    if resp.status_code != 200:
         print("Bad response")
     return resp
+
     
 
 def get_all_pcurrencies(username):
