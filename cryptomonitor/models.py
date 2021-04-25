@@ -37,7 +37,7 @@ class crypto_portfolio(db.Model):
         }
         props["currencyamount"] = {
             "description": "Amount of currency",
-            "type": "string"
+            "type": "number"
         }
         return schema
 

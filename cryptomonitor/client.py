@@ -71,8 +71,8 @@ def register():
 ######################
 
 def start_menu():
-    print("*** CryptoMonitoring API Client ***")
-    print("START MENU\n")
+    print("\n*** CryptoMonitoring API Client ***")
+    print("\nSTART MENU\n")
     while True:
         print("Choose the functionality you want to use:")
         print("(L) Login")
@@ -99,9 +99,9 @@ def start_menu():
             continue
 
 def main_menu():
-    print("*** MAIN MENU ***\n")
     while True:
-        print("Choose the functionality you want to use:")
+        print("\n*** MAIN MENU ***")
+        print("\nChoose the functionality you want to use:")
         print("(C) Cryptocurrencies")
         print("(P) Portfolio")
         print("(A) Account")
@@ -132,8 +132,8 @@ def cryptocurrency_menu():
         for ccurrency in body["items"]:
             print(ccurrency["name"] + " | " + ccurrency["abbreviation"])
         while True:
-            abbr = input("\nType abbreviation of cryptocurrency for more information, or 'exit' to return: ").lower()
-            if abbr == "exit":
+            abbr = input("\nType abbreviation of cryptocurrency for more information, or 'r' to return: ").lower()
+            if abbr == "r":
                 return
             cresp= get_cryptocurrency(abbr)
             if cresp.status_code == 200:
@@ -157,7 +157,7 @@ def portfolio_menu():
             pc_body = pc_resp.json()
             print("Total value: " + str(pfolio_body["value"]))
             print("Timestamp: " + str(pfolio_body["timestamp"]))
-            print("Cryptocurrencies included:")
+            print("Cryptocurrencies included:\n")
             for pcurrency in pc_body["items"]:
                 print("Cryptocurrency: "+ pcurrency["currencyname"])
                 print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
@@ -188,7 +188,7 @@ def pcurrency_menu():
             else:
                 print("Cryptocurrency doesn't exist")
         elif choice == 'e':
-            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").lower()
+            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").upper()
             pcurrency = get_pcurrency(username, abbr)
             if pcurrency.status_code == 200:
                 new_amount = input("Give new amount: ")
@@ -196,7 +196,7 @@ def pcurrency_menu():
             else:
                 print("Cryptocurrency not found in the portfolio")
         elif choice == 'd':
-            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").lower()
+            abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").upper()
             resp = delete_pcurrency(username, abbr)
             if resp.status_code == 204:
                 print("Cryptocurrency has been removed from portfolio")
@@ -208,15 +208,20 @@ def pcurrency_menu():
             input("Invalid input. Press anything to continue: ")
 
 def account_menu(username):
-    account = get_account(username)
-    if account.status_code == 200:
-        print("\nACCOUNT INFORMATION\n")
-        body = account.json()
+    acc_resp = get_account(username)
+    if acc_resp.status_code == 200:
+        print("\nACCOUNT INFORMATION:\n")
+        acc_body = acc_resp.json()
+        pfolio_url = acc_body["@controls"]["portfolio"]["href"]
+        pfolio_resp = requests.get(API_URL + pfolio_url)
+        pfolio_body = pfolio_resp.json()
+        print("Name: "+str(acc_body["name"]))
+        print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
         while True:
             print("(E) Edit account")
             print("(D) Delete account")
-            print("(M) Main menu")
-            choice = input("Choose E, D or M: ")
+            print("(R) Return")
+            choice = input("Choose E, D or R: ")
             choice = choice.lower()
             if choice == "e":
                 pass
@@ -232,8 +237,8 @@ def account_menu(username):
                         break
                     else:
                         print("Invalid input.")
-            elif choice == "m":
-                main_menu()
+            elif choice == "r":
+                return
             else:
                 input("Invalid input. Press anything to continue: ")
 
@@ -273,14 +278,8 @@ def get_account(username):
     """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
     acc_resp = requests.get(account_url)
-    if acc_resp.status_code == 200:
-        acc_body = acc_resp.json()
-        pfolio_url = acc_body["@controls"]["portfolio"]["href"]
-        pfolio_resp = requests.get(API_URL + pfolio_url)
-        pfolio_body = pfolio_resp.json()
-        print("Name: "+str(acc_body["name"]))
-        print("Portfolio-ID: "+str(acc_body["portfolio_id"]))
-        print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
+    if acc_resp.status_code != 200:
+        print("Bad response")
     return acc_resp
 
 def put_account(username, new_username, passwd):
@@ -307,8 +306,10 @@ def get_portfolio(username):
     return resp
 
 def get_pcurrency(username, abbr):
-    get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr) + "/"
-    resp = requests.get(get_url)
+    pcurrency_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr) + "/"
+    print(pcurrency_url)
+    resp = requests.get(pcurrency_url)
+    print(resp.status_code)
     return resp
 
 def get_all_pcurrencies(username):
@@ -395,7 +396,16 @@ def get_pcurrency_json(abbreviation, amount):
 #main_menu()
 #get_portfolio("test-account-2")
 
-while True:
-    start_menu()
-    main_menu()
-    #pcurrency_menu()
+#while True:
+#   start_menu()
+#    main_menu()
+resp = get_pcurrency("test-account-2", "eth")
+print(resp)
+#print(resp.json())
+
+
+"""
+resp = get_all_pcurrencies("test-account-2")
+print(resp.json())
+
+"""

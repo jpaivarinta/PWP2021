@@ -43,7 +43,7 @@ class PortfolioCurrency(Resource):
             body.add_control_get_currency_info(currency.abbreviation)
             body.add_control_edit_pcurrency(account=account, pcurrency=pcurrency)
             body.add_control_delete_pcurrency(account, currency.abbreviation)
-            return Response(json.dumps(body), 200, mimetype=MASON)
+            return Response(data=json.dumps(body), status=200, mimetype=MASON)
         else:
             return create_error_response(404, "Currency not found in portfolio")
 
