@@ -306,7 +306,7 @@ def get_portfolio(username):
     return resp
 
 def get_pcurrency(username, abbr):
-    pcurrency_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr) + "/"
+    pcurrency_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr).upper() + "/"
     print(pcurrency_url)
     resp = requests.get(pcurrency_url)
     print(resp.status_code)
@@ -386,7 +386,7 @@ def get_pcurrency_json(abbreviation, amount):
 #get_all_accounts()
 #post_account("test-account-7", "pswd7")
 #get_account("test-account-1")
-#get_all_cryptocurrencies()
+# get_all_cryptocurrencies()
 #get_cryptocurrency("ETh")
 # post_pcurrency("test-account-1", "eth", 2000.111)
 # get_all_pcurrencies("test-account-1")
@@ -399,13 +399,12 @@ def get_pcurrency_json(abbreviation, amount):
 #while True:
 #   start_menu()
 #    main_menu()
-resp = get_pcurrency("test-account-2", "eth")
-print(resp)
+# resp = get_pcurrency("test-account-2", "eth")
+# print(resp)
 #print(resp.json())
 
 
-"""
+
 resp = get_all_pcurrencies("test-account-2")
 print(resp.json())
 
-"""
