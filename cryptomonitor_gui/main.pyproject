@@ -1,0 +1,3 @@
+{
+    "files": ["main.py","RegisterPage.qml","LoginPage.qml","main.qml","StartPage.qml","MyTextInput.qml"]
+}

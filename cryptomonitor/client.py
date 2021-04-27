@@ -378,6 +378,21 @@ def get_cryptocurrency(abbreviation):
 
 
 # HELPER FUNCTIONS
+def try_login(username, password):
+    accounts_resp = get_all_accounts()
+    body = accounts_resp.json()
+    found = False
+    for item in body["items"]:
+        if item["name"]==username:
+            # User found check if passwords match
+            if item["password"] == password:
+                return True
+            else:
+                return False
+
+    print("Username not found, Try again\n")
+    return False
+
 def get_pcurrency_json(abbreviation, amount):
     return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":float(amount)}
 
