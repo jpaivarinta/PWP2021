@@ -254,7 +254,23 @@ def account_menu(username):
             choice = input("Choose E, D or R: ")
             choice = choice.lower()
             if choice == "e":
-                pass
+                edit_choice = input("\nEdit:\n(N) Name\n(P) Password\n\nor type 'r' to return ").lower()
+                if edit_choice == "n":
+                    new_name = input("Insert your new account name: ")
+                    return
+                elif edit_choice == 'p':
+                    new_password = input("Insert your new password: ")
+                    new_password2 = input("Insert your new password again: ")
+                    if(new_password != new_password2):
+                        input("Your given passwords didn't match, press anything to continue")
+                        continue
+                    return
+                elif edit_choice == "r":
+                    continue
+                else:
+                    input("Invalid input, press anything to continue. ")
+                    continue
+                    
             elif choice == "d":
                 while True:
                     confirm = input("Are you sure you want to delete account? Y or N: ")
