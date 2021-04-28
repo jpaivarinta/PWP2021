@@ -70,12 +70,21 @@ class PortfolioCurrency(Resource):
             return create_error_response(404, "Currency doesn't exist")
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+        # Value of all pcurrencies in the portfolio
+        total_amount = 0
+        pfolio_currency = None
         for pc in db_pcurrencies:
-             if pc.cryptocurrency_id==db_currency.id:
-                 pcurrency = pc
-                 break
-        if pcurrency:
+            if pc.cryptocurrency_id==db_currency.id:
+                pfolio_currency = pc
+                #break
+            else:
+                coin = CryptoCurrency.query.filter_by(id=pc.cryptocurrency_id).first()
+                total_amount = total_amount + (pc.currencyAmount * coin.value)
+        if pfolio_currency:
+            total_amount = total_amount + request.json["currencyamount"]
             pcurrency.currencyAmount = request.json["currencyamount"]
+            # Updates the total value of the portfolio
+            db_portfolio.value = total_amount
             db.session.commit()
         else:
             return create_error_response(404, "Currency not in portfolio")
@@ -163,6 +172,19 @@ class PortfolioCurrencyCollection(Resource):
             db.session.commit()
         except IntegrityError:
             return create_error_response(409, "Already exists")
+
+        # Find all pcurrencies from users portfolio 
+        db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+        # Value of all pcurrencies in the portfolio
+        total_amount = 0
+
+        for pc in db_pcurrencies:
+            coin = CryptoCurrency.query.filter_by(id=pc.cryptocurrency_id).first()    
+            total_amount = total_amount + (pc.currencyAmount * coin.value)
+            
+        # Updates the total value of the portfolio
+        db_portfolio.value = total_amount
+        db.session.commit()
 
         return Response(status=201, headers={
             "Location": url_for("api.portfoliocurrency", account=account, pcurrency=request.json["currencyname"])
