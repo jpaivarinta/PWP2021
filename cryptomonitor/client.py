@@ -211,7 +211,6 @@ def pcurrency_menu():
         elif choice == 'e':
             abbr = input("Give abbreviation of cryptocurrency in the portfolio: ").upper()
             pcurrency = get_pcurrency(username, abbr)
-            print(pcurrency.json())
             if pcurrency.status_code == 200:
                 new_amount = input("Give new amount: ")
                 while(not check_float_input(new_amount)):

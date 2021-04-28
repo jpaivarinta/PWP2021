@@ -104,7 +104,7 @@ def init_db_command():
 @click.command("testgen")
 @with_appcontext
 def generate_test_data():
-
+    """
     a1 = UserAccount(
         name="test-account-1",
         password="pswd"
@@ -114,6 +114,11 @@ def generate_test_data():
         name="test-account-2",
         password="pswd"
     )
+
+    db.session.add(a1)
+    db.session.add(a2)
+    """
+    """ THESE ARE ALREADY CREATED IN ACCOUNT BY DEFAULT
 
     p1 = Portfolio(
         timestamp=datetime.now(),
@@ -127,7 +132,8 @@ def generate_test_data():
 
     a1.portfolio = p1
     a2.portfolio = p2
-
+    """
+    
     c1 = CryptoCurrency(
         name="Bitcoin",
         abbreviation="BTC",
@@ -147,24 +153,23 @@ def generate_test_data():
         blockchain_length=3610463
     )
 
+    """
+
     cp1 = crypto_portfolio(
         currencyAmount=5.5,
         cryptocurrency=c1,
-        portfolio=p1
+        portfolio=a1.portfolio
     )
 
     cp2 = crypto_portfolio(
         currencyAmount=6.5,
         cryptocurrency=c2,
-        portfolio=p2
+        portfolio=a2.portfolio
     )
-
-    db.session.add(a1)
-    db.session.add(a2)
-    db.session.add(p1)
-    db.session.add(p2)
+    """
     db.session.add(c1)
     db.session.add(c2)
-    db.session.add(cp1)
-    db.session.add(cp2)
+
+    #db.session.add(cp1)
+    #db.session.add(cp2)
     db.session.commit()

@@ -27,11 +27,12 @@ class PortfolioCurrency(Resource):
             return create_error_response(404, "Currency not found in system")
         
         pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=port.id).all()
+        pfolio_currency = None
         for pc in pcurrencies:
             if pc.cryptocurrency_id==currency.id:
-                pcurrency = pc
+                pfolio_currency = pc
                 break
-        if pcurrency:
+        if pfolio_currency is not None:
             body = CryptoMonitorBuilder(id=currency.id, name=currency.name, abbreviation=currency.abbreviation,
             timestamp=currency.timestamp.isoformat(), value=currency.value, daily_growth=currency.daily_growth,
             launchDate=currency.launchDate.isoformat(), blockchain_length=currency.blockchain_length, currencyAmount=pc.currencyAmount 

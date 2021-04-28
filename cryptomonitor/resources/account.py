@@ -3,7 +3,7 @@ from jsonschema import validate, ValidationError
 from flask import request, Response, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-from cryptomonitor.models import UserAccount, Portfolio
+from cryptomonitor.models import UserAccount, Portfolio, crypto_portfolio
 from cryptomonitor.utils import CryptoMonitorBuilder, create_error_response
 from cryptomonitor.constants import *
 from cryptomonitor import db
@@ -53,18 +53,22 @@ class AccountCollection(Resource):
             validate(request.json, UserAccount.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
-
-        portfolio = Portfolio(
-            timestamp=datetime.now(),
-            value=0.0
-        )
-        useraccount = UserAccount(
-            name=request.json["name"],
-            password=request.json["password"],
-            portfolio = portfolio
-        )
-
         try:
+            pf = Portfolio(
+                timestamp=datetime.now(),
+                value=0.0
+            )
+            db.session.add(pf)
+            cryptoPortfolio = crypto_portfolio(
+                currencyAmount=0.0,
+                portfolio=pf
+            )
+            db.session.add(cryptoPortfolio)
+            useraccount = UserAccount(
+                name=request.json["name"],
+                password=request.json["password"],
+                portfolio=pf
+            )
             db.session.add(useraccount)
             db.session.commit()
         except IntegrityError:
