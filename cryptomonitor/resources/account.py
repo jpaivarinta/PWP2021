@@ -54,23 +54,26 @@ class AccountCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
         try:
+            useraccount = UserAccount(
+                name=request.json["name"],
+                password=request.json["password"],
+            )
             pf = Portfolio(
                 timestamp=datetime.now(),
                 value=0.0
             )
-            db.session.add(pf)
+            useraccount.portfolio = pf
+            """
             cryptoPortfolio = crypto_portfolio(
                 currencyAmount=0.0,
                 portfolio=pf
             )
-            db.session.add(cryptoPortfolio)
-            useraccount = UserAccount(
-                name=request.json["name"],
-                password=request.json["password"],
-                portfolio=pf
-            )
+            """
             db.session.add(useraccount)
+            db.session.add(pf)
+            #db.session.add(cryptoPortfolio)
             db.session.commit()
+
         except IntegrityError:
             return create_error_response(409, "Already exists",
             "User account with name {} already exists".format(request.json["name"]))

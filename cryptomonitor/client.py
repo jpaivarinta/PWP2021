@@ -63,7 +63,7 @@ def register():
             if password == password2:
                 break
             print("Passwords did not match")
-        post_account(username, password)
+        resp = post_account(username, password)
     else:
         print("Bad response")
 
@@ -73,7 +73,7 @@ def register():
 
 def start_menu():
     while True:
-        clear_terminal()
+        #clear_terminal()
         print("\n*** CryptoMonitoring API Client ***")
         print("\nSTART MENU\n")
         print("Choose the functionality you want to use:")
