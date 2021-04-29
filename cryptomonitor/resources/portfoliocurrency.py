@@ -106,6 +106,20 @@ class PortfolioCurrency(Resource):
             if pc.cryptocurrency_id==db_currency.id:
                 db.session.delete(pc)
                 db.session.commit()
+
+                # Find all pcurrencies from users portfolio 
+                db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+                # Value of all pcurrencies in the portfolio
+                total_amount = 0
+
+                for pc in db_pcurrencies:
+                    coin = CryptoCurrency.query.filter_by(id=pc.cryptocurrency_id).first()    
+                    total_amount = total_amount + (pc.currencyAmount * coin.value)
+                    
+                # Updates the total value of the portfolio
+                db_portfolio.value = total_amount
+                db.session.commit()
+
                 return Response(status=204)
         return create_error_response(404, "Currency not found in user's portfolio")
 

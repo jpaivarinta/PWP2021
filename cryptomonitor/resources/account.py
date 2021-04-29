@@ -96,7 +96,8 @@ class AccountItem(Resource):
         body = CryptoMonitorBuilder(
             id=single_account.id,
             name=single_account.name,
-            portfolio_id=single_account.portfolio_id
+            portfolio_id=single_account.portfolio_id,
+            password=single_account.password
         )
 
         body.add_control("self", url_for("api.accountitem", account=account))

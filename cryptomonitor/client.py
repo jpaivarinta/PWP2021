@@ -21,6 +21,8 @@ def login():
         while True:
             found = False
             name_input = input("Username: ")
+            if name_input == "":
+                return
             for item in body["items"]:
                 if name_input == item["name"]:
                     found = True
@@ -28,7 +30,7 @@ def login():
                     break
             if found == True:
                 break
-            print("Username not found, Try again\n")
+            print("Username not found, try again or press enter to return\n")
         while True:
             if attempts == 4:
                 print("Too many attempts, going back to Start Menu")
@@ -73,7 +75,7 @@ def register():
 
 def start_menu():
     while True:
-        #clear_terminal()
+        clear_terminal()
         print("\n*** CryptoMonitoring API Client ***")
         print("\nSTART MENU\n")
         print("Choose the functionality you want to use:")
@@ -99,7 +101,10 @@ def start_menu():
             continue
 
 def main_menu():
+    global logged_in
     while True:
+        if logged_in == False:
+            return
         clear_terminal()
         print("\n*** MAIN MENU ***")
         print("\nChoose the functionality you want to use:")
@@ -118,7 +123,7 @@ def main_menu():
             portfolio_menu()
         elif choice == "a":
             print("Account chosen")
-            account_menu(username)
+            account_menu()
         elif choice == "l":
             print("Logging out")
             logged_in = False
@@ -236,47 +241,34 @@ def pcurrency_menu():
         else:
             input("Invalid input. Press anything to continue: ")
 
-def account_menu(username):
-    clear_terminal()
-    acc_resp = get_account(username)
-    if acc_resp.status_code == 200:
-        print("\nACCOUNT INFORMATION:\n")
-        acc_body = acc_resp.json()
-        pfolio_url = acc_body["@controls"]["portfolio"]["href"]
-        pfolio_resp = requests.get(API_URL + pfolio_url)
-        pfolio_body = pfolio_resp.json()
-        print("Name: "+str(acc_body["name"]))
-        print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
-        while True:
+def account_menu():
+    global username
+    global logged_in
+    while True:
+        clear_terminal()
+        acc_resp = get_account(username)
+        if acc_resp.status_code == 200:
+            print("\nACCOUNT INFORMATION:\n")
+            acc_body = acc_resp.json()
+            pfolio_url = acc_body["@controls"]["portfolio"]["href"]
+            pfolio_resp = requests.get(API_URL + pfolio_url)
+            pfolio_body = pfolio_resp.json()
+            print("Name: "+str(acc_body["name"]))
+            print("Portfolio value: " + str(pfolio_body["value"]) + "\n")
             print("(E) Edit account")
             print("(D) Delete account")
             print("(R) Return")
             choice = input("Choose E, D or R: ")
             choice = choice.lower()
             if choice == "e":
-                edit_choice = input("\nEdit:\n(N) Name\n(P) Password\n\nor type 'r' to return ").lower()
-                if edit_choice == "n":
-                    new_name = input("Insert your new account name: ")
-                    return
-                elif edit_choice == 'p':
-                    new_password = input("Insert your new password: ")
-                    new_password2 = input("Insert your new password again: ")
-                    if(new_password != new_password2):
-                        input("Your given passwords didn't match, press anything to continue")
-                        continue
-                    return
-                elif edit_choice == "r":
-                    continue
-                else:
-                    input("Invalid input, press anything to continue. ")
-                    continue
-                    
+                edit_account()                    
             elif choice == "d":
                 while True:
                     confirm = input("Are you sure you want to delete account? Y or N: ")
                     confirm = confirm.lower()
                     if confirm == "y":
                         resp = delete_account(username)
+                        username = ""
                         logged_in = False
                         return 
                     elif confirm == "n":
@@ -287,6 +279,57 @@ def account_menu(username):
                 return
             else:
                 input("Invalid input. Press anything to continue: ")
+
+def edit_account():
+    global username
+    while True:
+        clear_terminal()
+        print("\nEDIT ACCOUNT:\n")
+        print("(N) Edit name")
+        print("(P) Edit password")
+        print("(R) Return")
+        edit_choice = input("Choose N, P or R: ").lower()
+        if edit_choice == "n":
+            new_name = input("Insert your new account name: ")
+            pwd = input("Insert your password to continue: ")
+            current_account = get_account(username)
+            body = current_account.json()
+            if(pwd == body["password"]):
+                resp = put_account(username, new_name, pwd)
+                if resp.status_code == 204:
+                    username = new_name
+                    input("Username has been changed successfully, press anything to continue")
+                else:
+                    input("An error occurred while changing username, press anything to continue")
+            else:
+                input("Incorrect password, press anything to continue")
+            continue
+        elif edit_choice == 'p':
+            old_password = input("Insert your current password: ")
+            current_account = get_account(username)
+            body = current_account.json()
+            if(old_password == body["password"]):
+                new_password = input("Insert your new password: ")
+                new_password2 = input("Insert your new password again: ")
+                if(new_password == new_password2):
+                    resp = put_account(username, username, new_password)
+                    if resp.status_code == 204:
+                        input("Password has been changed successfully, press anything to continue")
+                    else:
+                        input("An error occurred while changing password, press anything to continue")
+                else:
+                    input("Your given passwords didn't match, press anything to continue")
+                    continue
+            else:
+                input("Incorrect password, press anything to continue")
+                continue               
+            
+            continue
+        elif edit_choice == "r":
+            return
+        else:
+            input("Invalid input, press anything to continue. ")
+            continue
 
 
 
@@ -312,8 +355,6 @@ def post_account(name, password):
     data["name"] = name
     data["password"] = password
     resp = requests.post(API_URL + "/api/accounts/", json=data)
-    if resp.status_code != 201:
-        print("Bad response")
     return resp
 
 def get_account(username):
@@ -324,13 +365,14 @@ def get_account(username):
     """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
     acc_resp = requests.get(account_url)
-    if acc_resp.status_code != 200:
-        print("Bad response")
     return acc_resp
 
-def put_account(username, new_username, passwd):
-    information = get_account_json(new_username, passwd)
-    resp = requests.put(API_URL + "/api/accounts/", data=json.dumps(information))
+def put_account(username, new_username, new_passwd):
+    #information = get_account_json(new_username, new_passwd)
+    data = {}
+    data["name"] = new_username
+    data["password"] = new_passwd
+    resp = requests.put(API_URL + "/api/accounts/" + username + "/", json=data)
     return resp
 
 def delete_account(username):
@@ -421,6 +463,9 @@ def clear_terminal():
 def get_pcurrency_json(abbreviation, amount):
     return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":float(amount)}
 
+def get_account_json(name, password):
+    return {"name": "{}".format(name), "password": "{}".format(password)}
+
 ### TESTING FUNCTIONS ###
 
 #get_all_accounts()
@@ -444,7 +489,7 @@ def check_float_input(input):
         print("Wrong input type, value must be number")
         return False
 
-
+logged_in = False
 while True:
     start_menu()
     main_menu()
