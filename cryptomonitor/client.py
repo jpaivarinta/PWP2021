@@ -504,10 +504,13 @@ def check_float_input(input):
         print("Wrong input type, value must be number")
         return False
 
+
 logged_in = False
-while True:
-    start_menu()
-    main_menu()
+
+if __name__ == "__main__":
+    while True:
+        start_menu()
+        main_menu()
 #resp = get_pcurrency("test-account-2", "eth")
 # print(resp)
 #print(resp.json())
