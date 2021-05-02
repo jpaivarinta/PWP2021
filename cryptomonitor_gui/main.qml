@@ -12,7 +12,7 @@ Window {
     StackView {
         id: pageStack
         anchors.fill: parent
-        initialItem: "StartPage.qml"
+        initialItem: "PortfolioPage.qml"
     }
 
     Component {

@@ -28,6 +28,21 @@ class CryptoCurrency(QObject):
     abbreviation = Property(str, fget=get_abbreviation)
     value = Property(float, fget=get_value)
 
+class PortfolioCurrency(QObject):
+    def __init__(self, abbreviation, currencyAmount, parent=None):
+        super().__init__(parent)
+        self._abbreviation=abbreviation
+        self._currencyAmount =currencyAmount
+
+    def get_amount(self):
+        return self._currencyAmount
+
+    def get_abbreviation(self):
+        return self._abbreviation
+
+
+    currencyAmount = Property(float, fget=get_amount )
+    abbreviation = Property(str, fget=get_abbreviation)
 
 class Foo(QObject):
     cryptocurrenciesChanged = Signal()
@@ -75,6 +90,26 @@ class Foo(QObject):
         if resp.status_code==200:
             body = resp.json();
             return body
+
+    @Slot(str, result="QVariant")
+    def get_portfolio(self, username):
+        resp = get_portfolio(username)
+        if resp.status_code==200:
+            return resp.json()
+
+    @Slot(str, result="QVariantList")
+    def get_pcurrencies(self, username):
+        resp = get_all_pcurrencies(username)
+        pcurrencies = []
+        if resp.status_code == 200:
+            body = resp.json()
+            for pc in body["items"]:
+                pcurrencies.append(PortfolioCurrency(abbreviation=pc["currencyname"],
+                                                     currencyAmount=pc["currencyamount"], parent=self))
+            return pcurrencies
+        else:
+            print("fuck")
+            return pcurrencies
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
