@@ -33,7 +33,7 @@ def login():
             print("Username not found, try again or press enter to return\n")
         while True:
             if attempts == 4:
-                print("Too many attempts, going back to Start Menu")
+                input("Too many attempts, press enter to continue")
                 return
             password = input("Password: ")
             if password == item["password"]:
