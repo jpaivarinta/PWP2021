@@ -12,7 +12,7 @@ Window {
     StackView {
         id: pageStack
         anchors.fill: parent
-        initialItem: "StartPage.qml"
+        initialItem: "CryptoCurrenciesPage.qml"
     }
 
     Component {
@@ -25,6 +25,19 @@ Window {
     Component {
         id: registerPage
         RegisterPage {
+
+        }
+    }
+    Component {
+        id: mainmenuPage
+        MainMenuPage {
+
+        }
+    }
+
+    Component {
+        id:cryptocurrenciesPage
+        CryptoCurrenciesPage {
 
         }
     }
