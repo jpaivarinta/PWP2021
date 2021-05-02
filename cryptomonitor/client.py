@@ -475,6 +475,31 @@ def try_login(username, password):
     print("Username not found, Try again\n")
     return False
 
+def try_register(name, password1, password2):
+    accounts = get_all_accounts()
+    if accounts.status_code == 200:
+        body = accounts.json()
+        taken = False
+        username = name
+        for item in body["items"]:
+            if username == item["name"]:
+                print("Username already taken")
+                taken = True
+                return "taken"
+
+        if password1 != password2:
+            print("Passwords did not match")
+            return "mismatch"
+
+        resp = post_account(username, password1)
+        if resp.status_code == 201:
+            return "success"
+        else:
+            return "Server fail"
+    else:
+        print("Bad response")
+        return "Bad response from server"
+
 def get_pcurrency_json(abbreviation, amount):
     return {"currencyname":"{}".format(abbreviation.upper()), "currencyamount":float(amount)}
 

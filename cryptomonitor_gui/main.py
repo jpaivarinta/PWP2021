@@ -51,6 +51,11 @@ class Foo(QObject):
         print("Login: {} {}".format(username,password))
         return try_login(username, password)
 
+    @Slot(str, str, str, result=str)
+    def register(self,name, pswd1,pswd2):
+        r = try_register(name,pswd1,pswd2)
+        return r
+
     @Slot(result="QVariantList")
     def get_currencies(self):
         resp = get_all_cryptocurrencies()
