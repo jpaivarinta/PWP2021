@@ -111,6 +111,15 @@ class Foo(QObject):
             print("fuck")
             return pcurrencies
 
+    @Slot(str, str, str, result=bool)
+    def add_pcurrency(self, username, currencyname, amount):
+        amount = float(amount)
+        resp = post_pcurrency(username, currencyname, amount)
+        if resp.status_code == 201:
+            return True
+        else:
+            return False
+
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     foo = Foo()

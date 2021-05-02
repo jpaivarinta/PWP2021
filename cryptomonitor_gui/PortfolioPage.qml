@@ -28,6 +28,7 @@ Page {
                 id: currencies_text
                 text: "currencies:"
             }
+
             Rectangle {
                 height: 200
                 Layout.fillWidth: parent
@@ -59,7 +60,15 @@ Page {
             ListModel {
                 id: cryptocurrencyModel
             }
-        }
+            }
+
+            Button {
+                id: editportfolio_button
+                text: qsTr("Edit portfolio")
+                onClicked: {
+                    pageStack.push("PortfolioCurrencyPage.qml", {username:username})
+                }
+            }
         }
     }
     Component.onCompleted: {

@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.3
 
 Page {
     id: root
+    property string username: ""
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -25,6 +26,9 @@ Page {
             id:button_portfolio
             text: qsTr("Portfolio")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            onClicked: {
+                pageStack.push("PortfolioPage.qml", {username: username})
+            }
         }
         Button {
             id:button_account

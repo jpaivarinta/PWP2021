@@ -26,7 +26,7 @@ Page {
                 var logged = foo.login_clicked(name,psw)
                 if (logged) {
                     console.log("logged in!!!")
-                    pageStack.push(mainmenuPage)
+                    pageStack.push(mainmenuPage, {username: name})
                 }
                 else {
                     console.log("fuck you failed to log in")
