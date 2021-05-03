@@ -44,8 +44,8 @@ class crypto_portfolio(db.Model):
 class UserAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
-    password = db.Column(db.String(256), nullable=False) #is this necessary?
-    portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"))
+    password = db.Column(db.String(256), nullable=False)
+    portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id")) #not needed?
 
     portfolio = db.relationship("Portfolio", back_populates="useraccount", uselist=False)
 
