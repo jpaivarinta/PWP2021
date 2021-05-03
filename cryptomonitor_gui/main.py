@@ -128,6 +128,14 @@ class Foo(QObject):
         else:
             return False
 
+    @Slot(str,str, result=bool)
+    def delete_pcurrency(self,username,currename):
+        resp = delete_pcurrency(username, currename)
+
+        if resp.status_code==204:
+            return True
+        return False
+
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     foo = Foo()

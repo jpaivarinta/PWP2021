@@ -7,6 +7,8 @@ import QtQuick.Layouts 1.3
 Page {
     id: root
     property string username: ""
+    property string selected_currency: ""
+
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -34,20 +36,7 @@ Page {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var amount = currencyamount_input.inputText.text;
-                            if(parseFloat(amount)<0)
-                            {
-                                status_text.text="Please input positive number";
-                                return;
-                            }
-
-                            var r = foo.edit_pcurrency(username, abbreviation, amount )
-                            if(r){
-                                status_text.text = "Success"
-                                updateModel();
-                            } else {
-                                status_text.text = "Fail"
-                            }
+                            selected_currency = abbreviation
                         }
                     }
                 }
@@ -64,9 +53,23 @@ Page {
             id: cryptocurrencyModel
         }
 
-        MyTextInput {
-            id: currencyamount_input
+        Button {
+            id: deletecurrency_button
+            text: qsTr("Delete currency")
+            onClicked:{
+                if(selected_currency=="")
+                    status_text.text = "Select currency."
+                else
+                {
+                    var r = foo.delete_pcurrency(username, selected_currency);
+                    if(r)
+                        status_text.text = "Success"
+                    else
+                        status_text.text = "Fail"
+                }
+            }
         }
+
         Text {
             id: status_text
         }
