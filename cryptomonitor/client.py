@@ -165,12 +165,17 @@ def portfolio_menu():
         if pfolio_resp.status_code == 200 and pc_resp.status_code == 200:
             pfolio_body = pfolio_resp.json()
             pc_body = pc_resp.json()
-            print("Total value: " + str(pfolio_body["value"]))
-            print("Timestamp: " + str(pfolio_body["timestamp"]))
-            print("Cryptocurrencies included:\n")
-            for pcurrency in pc_body["items"]:
-                print("Cryptocurrency: "+ pcurrency["currencyname"])
-                print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
+            if not pc_body["items"]:
+                print("No cryptocurrencies in Portfolio\n")
+            else:
+                print("Total value: " + str(pfolio_body["value"]))
+                print("Timestamp: " + str(pfolio_body["timestamp"]))
+                print("Cryptocurrencies included:\n")
+                for pcurrency in pc_body["items"]:
+                    print("Cryptocurrency: "+ pcurrency["currencyname"])
+                    print("Amount: " + str(pcurrency["currencyamount"]) + "\n")
+                
+
             print("(E) Edit portfolio")
             print("(R) Return")
             choice = input("Choose E or R: ").lower()
