@@ -82,7 +82,7 @@ class PortfolioCurrency(Resource):
                 total_amount = total_amount + (pc.currencyAmount * coin.value)
         if pfolio_currency:
             total_amount = total_amount + request.json["currencyamount"]
-            pcurrency.currencyAmount = request.json["currencyamount"]
+            pfolio_currency.currencyAmount = request.json["currencyamount"]
             # Updates the total value of the portfolio
             db_portfolio.value = total_amount
             db.session.commit()
@@ -204,4 +204,12 @@ class PortfolioCurrencyCollection(Resource):
             "Location": url_for("api.portfoliocurrency", account=account, pcurrency=request.json["currencyname"])
         })
 
-        
+
+def calculate_total_value(db_currencies, db_pcurrencies):
+    tv = 0.0
+    for p in db_pcurrencies:
+        for c in db_currencies:
+            if p.cryptocurrency_id==c.id:
+                tv += p.currencyAmount * c.value
+                break
+    return tv

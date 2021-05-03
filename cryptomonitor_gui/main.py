@@ -120,6 +120,14 @@ class Foo(QObject):
         else:
             return False
 
+    @Slot(str,str,str, result=bool)
+    def edit_pcurrency(self, username, abbr, amount):
+        resp = put_pcurrency(username, abbr, float(amount))
+        if resp.status_code == 204:
+            return True
+        else:
+            return False
+
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     foo = Foo()
