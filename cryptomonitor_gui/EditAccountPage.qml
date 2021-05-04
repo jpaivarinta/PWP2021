@@ -47,12 +47,29 @@ Page {
                 var pass2 = p2_input.text
 
                 var r = foo.edit_account(newName, username, pass1,pass2)
-            }
+                if(r==="Success") {
+                    foo.username = newName
+                }
         }
     }
 
-}
 
+}
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
+    }
+}
 /*##^##
 Designer {
     D{i:0;autoSize:true;formeditorZoom:0.75;height:480;width:640}D{i:1}

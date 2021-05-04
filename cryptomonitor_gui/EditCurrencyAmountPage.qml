@@ -71,19 +71,14 @@ Page {
             id: status_text
         }
 
-        Button {
-            id: button_logout
-            text: qsTr("Logout")
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            onClicked: pageStack.pop()
-        }
+
     }
     Component.onCompleted: {
         // cryptocurrencyModel.append({name:"doge",value:200})
         updateModel();
     }
     function updateModel()  {
-        var currency_list = foo.get_pcurrencies(username)
+        var currency_list = foo.get_pcurrencies(foo.username)
         console.log(currency_list)
         if(currency_list.length>0)
         {
@@ -93,5 +88,19 @@ Page {
             cryptocurrencyModel.append({abbreviation:currency.abbreviation, amount: currency.currencyAmount})
             }
         }
+    }
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 }

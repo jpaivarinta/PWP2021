@@ -36,7 +36,7 @@ Page {
                         anchors.fill: parent
                         onClicked: {
                             var amount = currencyamount_input.inputText.text
-                            var r = foo.add_pcurrency(username, abbreviation, amount )
+                            var r = foo.add_pcurrency(foo.username, abbreviation, amount )
                             if(r){
                                 status_text.text = "Success"
                             } else {
@@ -65,12 +65,7 @@ Page {
             id: status_text
         }
 
-        Button {
-            id: button_logout
-            text: qsTr("Logout")
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            onClicked: pageStack.pop()
-        }
+
     }
     Component.onCompleted: {
         // cryptocurrencyModel.append({name:"doge",value:200})
@@ -82,5 +77,19 @@ Page {
             cryptocurrencyModel.append({name:currency.name,abbreviation:currency.abbreviation,
                                            value:currency.value})
         }
+    }
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 }

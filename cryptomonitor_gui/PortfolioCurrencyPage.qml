@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.3
 
 Page {
     id: root
-    property string  username: "test-account-1"
+    property string  username: ""
     ColumnLayout {
         anchors.fill: parent
         Text{
@@ -17,7 +17,7 @@ Page {
             id: addcurrency_button
             text: "Add cryptocurrency"
             onClicked: {
-                pageStack.push("AddCurrencyPage.qml", {username: username})
+                pageStack.push("AddCurrencyPage.qml")
             }
         }
 
@@ -25,7 +25,7 @@ Page {
             id: editcurrency_button
             text: "edit cryptocurrency amount"
             onClicked: {
-                pageStack.push("EditCurrencyAmountPage.qml", {username:username})
+                pageStack.push("EditCurrencyAmountPage.qml")
             }
         }
 
@@ -33,10 +33,24 @@ Page {
             id: deletecurrency_button
             text: "Delete cryptocurrency"
             onClicked: {
-                pageStack.push("DeleteCurrencyPage.qml", {username: username})
+                pageStack.push("DeleteCurrencyPage.qml")
             }
 
         }
+    }
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 
 }

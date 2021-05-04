@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.3
 
 Page {
     id: root
-    property string username: "test-account-1"
+    property string username: ""
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -66,18 +66,18 @@ Page {
                 id: editportfolio_button
                 text: qsTr("Edit portfolio")
                 onClicked: {
-                    pageStack.push("PortfolioCurrencyPage.qml", {username:username})
+                    pageStack.push("PortfolioCurrencyPage.qml")
                 }
             }
         }
     }
     Component.onCompleted: {
         // cryptocurrencyModel.append({name:"doge",value:200})
-        var portfolio = foo.get_portfolio(username)
+        var portfolio = foo.get_portfolio(foo.username)
         totalvalue_text.text = "total value: " + portfolio.value
         timestamp_text.text = "timestamp: " + portfolio.timestamp
 
-        var currency_list = foo.get_pcurrencies(username)
+        var currency_list = foo.get_pcurrencies(foo.username)
         console.log(currency_list)
         if(currency_list.length>0)
         {
@@ -87,5 +87,20 @@ Page {
             cryptocurrencyModel.append({abbreviation:currency.abbreviation, amount: currency.currencyAmount})
             }
         }
+    }
+
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 }

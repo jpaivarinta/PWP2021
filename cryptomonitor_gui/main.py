@@ -47,15 +47,27 @@ class PortfolioCurrency(QObject):
 
 class Foo(QObject):
     cryptocurrenciesChanged = Signal()
+    usernameChanged = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._cryptocurrencies = {}
+        self._username = ""
 
     def get_cryptocurrencies(self):
         return self._cryptocurrencies
 
     cryptocurrencies = Property("QVariantList", fget=get_cryptocurrencies, notify=cryptocurrenciesChanged)
+
+    def get_username(self):
+        return self._username
+
+    def set_username(self, user):
+        if self._username != user:
+            self._username = user
+            self.usernameChanged.emit(self._username)
+
+        username = Property(str, fget=get_username, fset=set_username, notify=usernameChanged)
 
     @Slot(str)
     def quit(self, msg):

@@ -26,12 +26,29 @@ Page {
                 var logged = foo.login_clicked(name,psw)
                 if (logged) {
                     console.log("logged in!!!")
+                    foo.username=name
                     pageStack.push(mainmenuPage, {username: name})
+
                 }
                 else {
                     console.log("fuck you failed to log in")
                 }
             }
         }
+    }
+
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 }

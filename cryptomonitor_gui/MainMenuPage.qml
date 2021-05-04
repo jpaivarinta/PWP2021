@@ -20,6 +20,7 @@ Page {
             id:button_crypto
             text: qsTr("Cryprtocurrencies")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            onClicked: pageStack.push("CryptoCurrenciesPage.qml")
         }
 
         Button {
@@ -27,7 +28,7 @@ Page {
             text: qsTr("Portfolio")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             onClicked: {
-                pageStack.push("PortfolioPage.qml", {username: username})
+                pageStack.push("PortfolioPage.qml")
             }
         }
         Button {
@@ -35,7 +36,7 @@ Page {
             text: qsTr("Account")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             onClicked: {
-                pageStack.push("AccountPage.qml", {username: username})
+                pageStack.push("AccountPage.qml")
             }
         }
 
@@ -43,7 +44,10 @@ Page {
             id: button_logout
             text: qsTr("Logout")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            onClicked: pageStack.pop()
+            onClicked: {
+                foo.username=""
+                pageStack.pop()
+            }
         }
     }
 }

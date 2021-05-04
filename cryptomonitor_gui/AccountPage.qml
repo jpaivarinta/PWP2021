@@ -32,7 +32,7 @@ Page {
             id: editaccount_button
             text: qsTr("Edit")
             onClicked: {
-                pageStack.push("EditAccountPage.qml", {username: username});
+                pageStack.push("EditAccountPage.qml");
             }
         }
 
@@ -40,18 +40,33 @@ Page {
             id: deleteaccount_button
             text: qsTr("Delete")
             onClicked: {
-                foo.delete_account(username);
+                foo.delete_account(foo.username);
+                foo.username = ""
                 pageStack.pop();
             }
         }
     }
 
     Component.onCompleted: {
-        var account = foo.get_account(username);
-        var portfolio = foo.get_portfolio(username);
+        var account = foo.get_account(foo.username);
+        var portfolio = foo.get_portfolio(foo.username);
 
         name_text.text = qsTr("Name: " + account.name);
         pfoliovalue_text.text = qsTr("Portfolio value: " + portfolio.value);
+    }
+    footer: ToolBar {
+        id: bottomToolBar
+        RowLayout {
+            anchors.centerIn: parent
+
+            ToolButton {
+                text: qsTr("Back")
+                onClicked: {
+                    onClicked: pageStack.pop()
+                }
+            }
+        }
+
     }
 
 }
