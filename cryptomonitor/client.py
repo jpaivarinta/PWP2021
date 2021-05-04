@@ -62,9 +62,9 @@ def register():
                 continue
             password = input("Give your account a password: ")
             password2 = input("Retype the password: ")
-            if password == password2:
+            if password == password2 and password != "":
                 break
-            print("Passwords did not match")
+            print("Passwords did not match or the given password was empty")
         resp = post_account(username, password)
     else:
         print("Bad response")
@@ -97,7 +97,7 @@ def start_menu():
             print("Quit chosen, terminating app.")
             sys.exit()
         else:
-            input("Invalid input, press anything to continue")
+            input("Invalid input, press enter to continue")
             continue
 
 def main_menu():
@@ -184,9 +184,9 @@ def portfolio_menu():
             elif choice == 'e':
                 pcurrency_menu()
             else:
-                input("Invalid input. Press anything to continue: ")
+                input("Invalid input. Press enter to continue: ")
         else:
-            input("Portfolio not found, press anything to return")
+            input("Portfolio not found, press enter to return")
             return
     
 def pcurrency_menu():
@@ -211,11 +211,11 @@ def pcurrency_menu():
                     amount = input("Give amount of cryptocurrency: ")
                 post_resp = post_pcurrency(username, abbr, amount)
                 if post_resp.status_code == 201:
-                    input("Cryptocurrency added to portfolio, press anything to continue")
+                    input("Cryptocurrency added to portfolio, press enter to continue")
                 else:
-                    input("Adding cryptocurrency failed, press anything to continue. ")
+                    input("Adding cryptocurrency failed, press enter to continue. ")
             else:
-                input("Cryptocurrency doesn't exist or it is already in portfolio, press anything to continue.")
+                input("Cryptocurrency doesn't exist or it is already in portfolio, press enter to continue.")
 
         #Edit cryptocurrency amount
         elif choice == 'e':
@@ -227,11 +227,11 @@ def pcurrency_menu():
                     new_amount = input("Give new amount: ")
                 put_resp = put_pcurrency(username, abbr, float(new_amount))
                 if put_resp.status_code == 204:
-                    input("Changes saved, press anything to continue")
+                    input("Changes saved, press enter to continue")
                 else:
-                    input("Editing portfolio failed, press anything to continue. ")
+                    input("Editing portfolio failed, press enter to continue. ")
             else:
-                input("Cryptocurrency not found in the portfolio, press anything to continue.")
+                input("Cryptocurrency not found in the portfolio, press enter to continue.")
 
         #Delete cryptocurrency from portfolio
         elif choice == 'd':
@@ -240,11 +240,11 @@ def pcurrency_menu():
             if resp.status_code == 204:
                 input("Cryptocurrency has been removed from portfolio")
             else:
-                input("Cryptocurrency not found in the portfolio, press anything to continue.")
+                input("Cryptocurrency not found in the portfolio, press enter to continue.")
         elif choice == 'r':
             return
         else:
-            input("Invalid input. Press anything to continue: ")
+            input("Invalid input. Press enter to continue: ")
 
 def account_menu():
     global username
@@ -283,7 +283,7 @@ def account_menu():
             elif choice == "r":
                 return
             else:
-                input("Invalid input. Press anything to continue: ")
+                input("Invalid input. Press enter to continue: ")
 
 def edit_account():
     global username
@@ -303,11 +303,13 @@ def edit_account():
                 resp = put_account(username, new_name, pwd)
                 if resp.status_code == 204:
                     username = new_name
-                    input("Username has been changed successfully, press anything to continue")
+                    input("Username has been changed successfully, press enter to continue")
+                elif resp.status_code == 409:
+                    input("Username already used, press enter to continue")
                 else:
-                    input("An error occurred while changing username, press anything to continue")
+                    input("An error occurred while changing username, press enter to continue")
             else:
-                input("Incorrect password, press anything to continue")
+                input("Incorrect password, press enter to continue")
             continue
         elif edit_choice == 'p':
             old_password = input("Insert your current password: ")
@@ -316,24 +318,24 @@ def edit_account():
             if(old_password == body["password"]):
                 new_password = input("Insert your new password: ")
                 new_password2 = input("Insert your new password again: ")
-                if(new_password == new_password2):
+                if(new_password == new_password2 and new_password != ""):
                     resp = put_account(username, username, new_password)
                     if resp.status_code == 204:
-                        input("Password has been changed successfully, press anything to continue")
+                        input("Password has been changed successfully, press enter to continue")
                     else:
-                        input("An error occurred while changing password, press anything to continue")
+                        input("An error occurred while changing password, press enter to continue")
                 else:
-                    input("Your given passwords didn't match, press anything to continue")
+                    input("Your given passwords didn't match or it was empty, press enter to continue")
                     continue
             else:
-                input("Incorrect password, press anything to continue")
+                input("Incorrect password, press enter to continue")
                 continue               
             
             continue
         elif edit_choice == "r":
             return
         else:
-            input("Invalid input, press anything to continue. ")
+            input("Invalid input, press enter to continue. ")
             continue
 
 
