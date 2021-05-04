@@ -34,6 +34,9 @@ Page {
             id:button_account
             text: qsTr("Account")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            onClicked: {
+                pageStack.push("AccountPage.qml", {username: username})
+            }
         }
 
         Button {
