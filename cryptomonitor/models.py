@@ -47,7 +47,7 @@ class UserAccount(db.Model):
     password = db.Column(db.String(256), nullable=False)
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id")) #not needed?
 
-    portfolio = db.relationship("Portfolio", back_populates="useraccount", uselist=False)
+    portfolio = db.relationship("Portfolio", back_populates="useraccount", single_parent=True, cascade="all, delete-orphan", uselist=False)
 
     @staticmethod
     def get_schema():
@@ -69,10 +69,10 @@ class UserAccount(db.Model):
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, nullable=False)
-    value = db.Column(db.Float, nullable=False) #How to accept only positive?
+    value = db.Column(db.Float, nullable=False)
     # useraccount_id = db.Column(db.Integer, db.ForeignKey("user_account.id"))
 
-    cryptocurrencies = db.relationship("crypto_portfolio",  back_populates="portfolio")
+    cryptocurrencies = db.relationship("crypto_portfolio",  back_populates="portfolio", single_parent=True, cascade="all, delete-orphan")
     useraccount = db.relationship("UserAccount", back_populates="portfolio", uselist=False)
 
     @staticmethod
