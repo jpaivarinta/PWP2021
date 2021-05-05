@@ -42,7 +42,7 @@ Page {
             onClicked: {
                 foo.delete_account(foo.username);
                 foo.username = ""
-                pageStack.pop();
+                pageStack.pop(null);
             }
         }
     }

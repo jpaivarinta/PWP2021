@@ -30,7 +30,7 @@ Page {
                 var psw2 = password2Input.inputText.text;
                 var res = foo.register(name,psw, psw2)
                 if (res==="success") {
-                    pageStack.push(loginPage)
+                    pageStack.pop();
                 }
                 else {
                     status_text.text=res;

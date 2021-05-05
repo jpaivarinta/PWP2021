@@ -71,8 +71,19 @@ Page {
             }
         }
     }
+
     Component.onCompleted: {
         // cryptocurrencyModel.append({name:"doge",value:200})
+        updateInfo();
+    }
+
+    onVisibleChanged: {
+        if(visible) {
+            updateInfo();
+        }
+    }
+
+    function updateInfo() {
         var portfolio = foo.get_portfolio(foo.username)
         totalvalue_text.text = "total value: " + portfolio.value
         timestamp_text.text = "timestamp: " + portfolio.timestamp

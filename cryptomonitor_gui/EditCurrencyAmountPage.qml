@@ -41,7 +41,7 @@ Page {
                                 return;
                             }
 
-                            var r = foo.edit_pcurrency(username, abbreviation, amount )
+                            var r = foo.edit_pcurrency(foo.username, abbreviation, amount )
                             if(r){
                                 status_text.text = "Success"
                                 updateModel();
