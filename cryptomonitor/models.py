@@ -132,7 +132,40 @@ def generate_test_data():
         blockchain_length=3610463
     )
 
+    c4 = CryptoCurrency(
+        name="Tether",
+        abbreviation="USDT",
+        timestamp=datetime.now(),
+        value=1.0,
+        daily_growth=0.01,
+        launchDate=datetime(1500, 5, 12),
+        blockchain_length=9191911
+    )
+
+    c5 = CryptoCurrency(
+        name="XRP",
+        abbreviation="XRP",
+        timestamp=datetime.now(),
+        value=1.67,
+        daily_growth=9.21,
+        launchDate=datetime(1500, 5, 12),
+        blockchain_length=52547
+    )
+
+    c6 = CryptoCurrency(
+        name="Polkadot",
+        abbreviation="DOT",
+        timestamp=datetime.now(),
+        value=40.37,
+        daily_growth=4.26,
+        launchDate=datetime(1500, 5, 12),
+        blockchain_length=57843
+    )
+
     db.session.add(c1)
     db.session.add(c2)
     db.session.add(c3)
+    db.session.add(c4)
+    db.session.add(c5)
+    db.session.add(c6)
     db.session.commit()

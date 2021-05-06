@@ -64,8 +64,8 @@ def _populate_db():
 		a.portfolio = p
 		cp = crypto_portfolio(portfolio=p, cryptocurrency=cc, currencyAmount=500.0)
 		cp2 = crypto_portfolio(portfolio=p, cryptocurrency=cc2, currencyAmount=47666.0)
-		p.cryptocurrencies.append(cp)
-		p.cryptocurrencies.append(cp2)
+		# p.cryptocurrencies.append(cp)
+		# p.cryptocurrencies.append(cp2)
 		db.session.add(cp)
 		db.session.add(cp2)
 		db.session.add(a)
