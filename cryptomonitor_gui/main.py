@@ -123,8 +123,8 @@ class Foo(QObject):
             for currency in body["items"]:
                 print(currency["abbreviation"])
                 currencies.append(
-                    CryptoCurrency(name=currency["name"], abbreviation=currency["abbreviation"], value=200.2,
-                                   parent=self))
+                    CryptoCurrency(name=currency["name"], abbreviation=currency["abbreviation"],
+                                   value=currency["value"], parent=self))
             return currencies
         print(self._cryptocurrencies)
 
