@@ -50,6 +50,9 @@ def login():
 
 
 def register():
+    """
+    Implements registering functionality
+    """
     accounts = get_all_accounts()
     if accounts.status_code == 200:
         body = accounts.json()
@@ -77,6 +80,9 @@ def register():
 ######################
 
 def start_menu():
+    """
+    Implements start-menu for logging, registering and quitting in the client.
+    """
     while True:
         clear_terminal()
         print("\n*** CryptoMonitoring API Client ***")
@@ -105,7 +111,11 @@ def start_menu():
 
 
 def main_menu():
+    """
+    Implements main-menu, where user can navigate to other menus
+    """
     global logged_in
+    # If user is logged out, program will return to start-menu
     while True:
         if logged_in == False:
             return
@@ -137,6 +147,10 @@ def main_menu():
 
 
 def cryptocurrency_menu():
+    """
+    Implements menu for cryptocurrency relative actions.
+    Prints the list of crypotcurrencies in the API and asks abbreviation for more specific information.
+    """
     clear_terminal()
     resp = get_all_cryptocurrencies()
     if resp.status_code == 200:
@@ -163,11 +177,16 @@ def cryptocurrency_menu():
 
 
 def portfolio_menu():
+    """
+    Implements menu for portfolio relative actions.
+    Prints the information about portfolio and asks user to edit portfolio or return.
+    """
     while True:
         clear_terminal()
         print("\nPORTFOLIO INFORMATION:\n")
         pfolio_resp = get_portfolio(username)
         pc_resp = get_all_pcurrencies(username)
+        # Checks if user has a portfolio
         if pfolio_resp.status_code == 200 and pc_resp.status_code == 200:
             pfolio_body = pfolio_resp.json()
             pc_body = pc_resp.json()
@@ -196,6 +215,9 @@ def portfolio_menu():
 
 
 def pcurrency_menu():
+    """
+    Implements menu for actions relative to cryptocurrencies in user's portfolio.
+    """
     while True:
         clear_terminal()
         print("\n*** EDIT PORTFOLIO ***\n")
@@ -210,8 +232,10 @@ def pcurrency_menu():
             abbr = input("Give abbreviation of cryptocurrency: ").lower()
             ccurrency = get_cryptocurrency(abbr)
             pcurrency = get_pcurrency(username, abbr)
-            if ccurrency.status_code == 200 and pcurrency.status_code == 404:  # Checks that currency not in portfolio
+            # Checks that currency not in portfolio
+            if ccurrency.status_code == 200 and pcurrency.status_code == 404:
                 amount = input("Give amount of cryptocurrency: ")
+                # Checks if new amount is a number
                 while (not check_float_input(amount)):
                     amount = input("Give amount of cryptocurrency: ")
                 post_resp = post_pcurrency(username, abbr, amount)
@@ -228,6 +252,7 @@ def pcurrency_menu():
             pcurrency = get_pcurrency(username, abbr)
             if pcurrency.status_code == 200:
                 new_amount = input("Give new amount: ")
+                # Checks if new amount is a number
                 while (not check_float_input(new_amount)):
                     new_amount = input("Give new amount: ")
                 put_resp = put_pcurrency(username, abbr, float(new_amount))
@@ -253,11 +278,15 @@ def pcurrency_menu():
 
 
 def account_menu():
+    """
+    Implements menu for choosing actions relative to user's account.
+    """
     global username
     global logged_in
     while True:
         clear_terminal()
         acc_resp = get_account(username)
+        # Checks if account is found
         if acc_resp.status_code == 200:
             print("\nACCOUNT INFORMATION:\n")
             acc_body = acc_resp.json()
@@ -280,6 +309,7 @@ def account_menu():
                     if confirm == "y":
                         resp = delete_account(username)
                         username = ""
+                        # If account is deleted, user is logged out
                         logged_in = False
                         return
                     elif confirm == "n":
@@ -293,6 +323,9 @@ def account_menu():
 
 
 def edit_account():
+    """
+    Implements menu and actions for editing user's account.
+    """
     global username
     while True:
         clear_terminal()
@@ -301,6 +334,7 @@ def edit_account():
         print("(P) Edit password")
         print("(R) Return")
         edit_choice = input("Choose N, P or R: ").lower()
+        # Editing account's name
         if edit_choice == "n":
             new_name = input("Insert your new account name: ")
             pwd = input("Insert your password to continue: ")
@@ -318,6 +352,7 @@ def edit_account():
             else:
                 input("Incorrect password, press enter to continue")
             continue
+        # Editing account's password
         elif edit_choice == 'p':
             old_password = input("Insert your current password: ")
             current_account = get_account(username)
@@ -351,19 +386,20 @@ def edit_account():
 ########################
 
 def get_all_accounts():
-    """ Requests a list of all Accounts"""
+    """
+    Get all accounts' informations.
+    :return: API's response.
+    """
     resp = requests.get(API_URL + "/api/accounts/")
-    if resp.status_code != 200:
-        print("Bad response")
     return resp
 
 
 def post_account(name, password):
     """
-    Posts a new account to database.
-    : param name: name for the account
-    : param password: password for the account
-    return: API's response to post try.
+    Post a new account.
+    :param name: name for the account
+    :param password: password for the account
+    :return: API's response.
     """
     data = {}
     data["name"] = name
@@ -374,17 +410,23 @@ def post_account(name, password):
 
 def get_account(username):
     """
-    Prints given account's information.
-    : param username: name of the printable account
-    return: API's response.
+    Get account's information.
+    :param username: name of the account
+    :return: API's response.
     """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
-    acc_resp = requests.get(account_url)
-    return acc_resp
+    resp = requests.get(account_url)
+    return resp
 
 
 def put_account(username, new_username, new_passwd):
-    # information = get_account_json(new_username, new_passwd)
+    """
+    Edit account's information.
+    :param username: name of the account
+    :param new_username: new name for the account
+    :param new_passwd: new password for the account
+    :return: API's response.
+    """
     data = {}
     data["name"] = new_username
     data["password"] = new_passwd
@@ -393,6 +435,11 @@ def put_account(username, new_username, new_passwd):
 
 
 def delete_account(username):
+    """
+    Delete account.
+    :param username: name of the account
+    :return: API's response.
+    """
     delete_url = API_URL + "/api/accounts/" + str(username) + "/"
     resp = requests.delete(delete_url)
     return resp
@@ -405,21 +452,19 @@ def delete_account(username):
 def get_portfolio(username):
     """
     Get user's portfolio.
-    :param username:
+    :param username: Name of the account
     :return: Request response object from the server.
     """
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
     resp = requests.get(get_url)
-    if resp.status_code != 200:
-        print("Bad response")
     return resp
 
 
 def get_pcurrency(username, abbr):
     """
-    Get a user's portfoliocurrency.
-    :param username:
-    :param abbr: Abbreviation of cryptocurrency.
+    Get a user's cryptocurrency in the portfolio.
+    :param username: Name of the account
+    :param abbr: Abbreviation of the cryptocurrency.
     :return: Request response object from the server.
     """
     pcurrency_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr).upper() + "/"
@@ -429,40 +474,37 @@ def get_pcurrency(username, abbr):
 
 def get_all_pcurrencies(username):
     """
-    Get a collection of user's portfoliocurrencies.
-    :param username:
+    Get a collection of user's cryptocurrencies in the portfolio.
+    :param username: Name of the account
     :return: Request response object from the server.
     """
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
     resp = requests.get(get_url)
-    if resp.status_code != 200:
-        print("Bad response")
     return resp
 
 
 def post_pcurrency(username, currency_abbreviation, currency_amount):
     """
-    Add new portfoliocurrency to user's portfolio.
-    :param username:
+    Add new cryptocurrency to user's portfolio.
+    :param username: Name of the account
     :param currency_abbreviation: Abbreviation of cryptocurrency.
-    :param currency_amount:
+    :param currency_amount: Amount of cryptocurrency
     :return: Request response object from the server.
     :note currency_abbreviation must be one of the existing currencies in the database.
     """
     currency_abbreviation = currency_abbreviation.upper()
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/".format(API_URL, username)
     pcurrency_body = {"currencyname": "{}".format(currency_abbreviation), "currencyamount": float(currency_amount)}
-    # send post requests
     resp = requests.post(pcurrency_url, json=pcurrency_body)
     return resp
 
 
 def put_pcurrency(username, currency_abbreviation, currency_amount):
     """
-    Edit currency amount of a user's portfoliocurrency.
-    :param username:
-    :param currency_abbreviation: abbreviation of cryptocurrency.
-    :param currency_amount:
+    Edit cryptocurrency amount in user's portfolio.
+    :param username: Name of the account
+    :param currency_abbreviation: Abbreviation of cryptocurrency.
+    :param currency_amount: Amount of cryptocurrency
     :return: Request response object from the server.
     """
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username,
@@ -474,18 +516,14 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
 
 def delete_pcurrency(username, currency_abbreviation):
     """
-    Remove user's portfoliocurrency
-    :param username:
+    Remove cryptocurrency from user's portfolio.
+    :param username: Name of the account
     :param currency_abbreviation: Abbreviation of cryptocurrency.
     :return: Request response object from the server.
     """
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username,
                                                                           currency_abbreviation.upper())
     resp = requests.delete(pcurrency_url)
-    # if resp.status_code == 204:
-    #    print("Currency {} removed from portfolio".format(currency_abbreviation))
-    # else:
-    #    print("Bad response")
     return resp
 
 
@@ -495,29 +533,26 @@ def delete_pcurrency(username, currency_abbreviation):
 
 def get_all_cryptocurrencies():
     """ 
-    Print all cryptocurrencies known by the API.
-    return: API's response.
+    Get all cryptocurrencies known by the API.
+    :return: API's response.
     """
     resp = requests.get(API_URL + "/api/currencies/")
-    if resp.status_code != 200:
-        print("Bad response")
     return resp
 
 
 def get_cryptocurrency(abbreviation):
     """ 
-    Print all cryptocurrencies known by the API.
-    : param abbreviation: abbreviation of currency.
-    return: API's response.
+    Get a cryptocurrency known by the API.
+    :param abbreviation: Abbreviation of currency.
+    :return: API's response.
     """
     currency_url = (API_URL + "/api/currencies/" + str(abbreviation).upper() + "/")
     resp = requests.get(currency_url)
-    if resp.status_code != 200:
-        print("Bad response")
     return resp
 
 
 def clear_terminal():
+    """ Clears the client's terminal. """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -525,9 +560,9 @@ def clear_terminal():
 def try_login(username, password):
     """
     Try login to account.
-    : param username:
-    : param password:
-    : return: Return True or False whether login succeeds.
+    :param username:
+    :param password:
+    :return: Return True or False whether login succeeds.
     """
     accounts_resp = get_all_accounts()
     body = accounts_resp.json()
@@ -547,10 +582,10 @@ def try_login(username, password):
 def try_register(name, password1, password2):
     """
     Try register new account
-    : param name:
-    : param password1:
-    : param password2: Retype password
-    : return: Returns a string indicating the result.
+    :param name:
+    :param password1:
+    :param password2: Retype password
+    :return: Returns a string indicating the result.
     """
     accounts = get_all_accounts()
     if accounts.status_code == 200:
@@ -578,29 +613,31 @@ def try_register(name, password1, password2):
 
 
 def get_pcurrency_json(abbreviation, amount):
+    """
+    Creates a JSON
+    :param abbreviation:
+    :param amount:
+    :return: json string
+    """
     return {"currencyname": "{}".format(abbreviation.upper()), "currencyamount": float(amount)}
 
 
 def get_account_json(name, password):
+    """
+    Creates a JSON
+    :param name:
+    :param password:
+    :return: json string
+    """
     return {"name": "{}".format(name), "password": "{}".format(password)}
 
 
-### TESTING FUNCTIONS ###
-
-# get_all_accounts()
-# post_account("test-account-7", "pswd7")
-# get_account("test-account-1")
-# get_all_cryptocurrencies()
-# get_cryptocurrency("ETh")
-# post_pcurrency("test-account-1", "eth", 2000.111)
-# get_all_pcurrencies("test-account-1")
-# put_pcurrency("test-account-1", "eth", 2.3)
-# delete_pcurrency("test-account-1", "btc")
-# get_all_pcurrencies("test-account-1")
-# main_menu()
-# get_portfolio("test-account-2")
-
 def check_float_input(input):
+    """
+    Checks if input is number.
+    :param input:
+    :return: Boolean
+    """
     try:
         val = float(input)
         return True
@@ -615,10 +652,3 @@ if __name__ == "__main__":
     while True:
         start_menu()
         main_menu()
-# resp = get_pcurrency("test-account-2", "eth")
-# print(resp)
-# print(resp.json())
-
-
-# resp = get_all_pcurrencies("test-account-2")
-# print(resp.json())
