@@ -26,7 +26,7 @@ And activate your virtualenv on **windows** by typing `pwp\SAcripts\activate.bat
 
 Clone this repository and navigate to it's root folder. Install all the requirements by typing
 ```
-pip install -r reuirements.txt
+pip install -r requirements.txt
 ``` 
 
 ## On windows
