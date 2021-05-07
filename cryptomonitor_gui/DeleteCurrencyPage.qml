@@ -22,7 +22,8 @@ Page {
 
         ScrollView {
             id: scrollView
-            width: 200
+            anchors.centerIn: parent
+            width: 600
             height: 200
             clip: true
             Component {

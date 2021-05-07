@@ -13,7 +13,7 @@ Page {
         Text {
             id: pagename_text
             text: qsTr("Account information")
-            font.pixelSize: 16
+            font.pixelSize: 15
         }
 
         Text {

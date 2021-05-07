@@ -14,6 +14,13 @@ Page {
         id: columnLayout
         anchors.fill: parent
 
+        Text {
+            id: pagename_text
+            text: qsTr("Edit account info")
+            font.pixelSize: 15
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        }
+
         MyTextInput {
             id: username_input
             inputText.text: "new username"
@@ -50,8 +57,9 @@ Page {
                 if(r==="Success") {
                     foo.username = newName
                 }
+            }
         }
-    }
+
 
 
 }

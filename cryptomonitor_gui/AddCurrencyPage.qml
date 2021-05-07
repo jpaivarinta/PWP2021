@@ -12,21 +12,22 @@ Page {
 
         Text {
             id: text_page_name
-            text: qsTr("Add currency portfolio")
+            text: qsTr("Add currency to portfolio")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         }
 
-
         ScrollView {
             id: scrollView
-            width: 200
+            anchors.centerIn: parent
+            width: 600
             height: 200
             clip: true
             Component {
                 id: cryptocurrencyDelegate
                 Item {
-                    width:200;height:contentHeight
+                    width: 600
+                    height:contentHeight
                     Column {
                         Text { text: "currency: " + name }
                         Text { text: "abbreviation: " + abbreviation}
@@ -52,10 +53,10 @@ Page {
                model: cryptocurrencyModel
                delegate: cryptocurrencyDelegate
            }
-        }
 
         ListModel {
             id: cryptocurrencyModel
+        }
         }
 
         MyTextInput {
@@ -93,3 +94,9 @@ Page {
 
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

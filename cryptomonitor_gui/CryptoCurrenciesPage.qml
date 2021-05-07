@@ -21,6 +21,7 @@ Page {
             id: scrollView
             width: 200
             height: 200
+            clip: true
             Component {
                 id: cryptocurrencyDelegate
                 Item {

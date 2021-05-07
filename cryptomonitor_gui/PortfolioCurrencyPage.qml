@@ -6,7 +6,10 @@ Page {
     id: root
     property string  username: ""
     ColumnLayout {
-        anchors.fill: parent
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+
         Text{
             id: main_text
             text: "Edit portfolio"
@@ -54,3 +57,9 @@ Page {
     }
 
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}D{i:4}D{i:5}
+}
+##^##*/

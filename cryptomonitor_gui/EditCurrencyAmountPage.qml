@@ -13,6 +13,7 @@ Page {
         Text {
             id: text_page_name
             text: qsTr("Edit currency amount")
+            font.pointSize: 15
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         }
@@ -20,7 +21,8 @@ Page {
 
         ScrollView {
             id: scrollView
-            width: 200
+            anchors.centerIn: parent
+            width: 600
             height: 200
             clip: true
             Component {
@@ -104,3 +106,9 @@ Page {
 
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
