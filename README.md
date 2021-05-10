@@ -7,6 +7,8 @@
 
 __Remember to include all required documentation and HOWTOs, including how to create and populate the database, how to run and test the API, the url to the entrypoint and instructions on how to setup and run the client__
 
+# Documentation
+The api documentation is available at [apiary](https://cryptomonitoringapi.docs.apiary.io/).
 
 # Install the dependencies
 You need to have [python3](https://www.python.org/downloads/) installed on your system.
@@ -16,17 +18,17 @@ It is recommended to create a new  virtual environment for the project. You can 
 pip install virtualenv
 ``` 
 
-Once the pip has installed virtualenv, go ahead and create as new virtualenv by typing 
+Once the pip has installed virtualenv, go ahead and create a new virtualenv by typing 
 
 ```
 virtualenv pwp
 ```
 
-And activate your virtualenv on **windows** by typing `pwp\SAcripts\activate.bat` to the command prompt.
+And activate your virtualenv on **windows** by typing `pwp\Scripts\activate.bat` to the command prompt.
 
 Clone this repository and navigate to it's root folder. Install all the requirements by typing
 ```
-pip install -r reuirements.txt
+pip install -r requirements.txt
 ``` 
 
 ## On windows
