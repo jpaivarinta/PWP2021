@@ -15,7 +15,11 @@ https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
 class PortfolioCurrency(Resource):
+
     def get(self, account, pcurrency):
+        """
+        GET method for getting a known cryptocurrency from portfolio
+        """
         user = UserAccount.query.filter_by(name=account).first()
         if user is None:
             return create_error_response(404, "User not found")
@@ -49,9 +53,10 @@ class PortfolioCurrency(Resource):
             return create_error_response(404, "Currency not found in portfolio")
 
 
-
     def put(self, account, pcurrency):
-
+        """
+        PUT method for editing a portfoliocurrency
+        """
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Request body must be json")
         try:
@@ -61,28 +66,32 @@ class PortfolioCurrency(Resource):
 
         if float(request.json["currencyamount"]) < 0:
             return create_error_response(400, "Invalid json body", "Currencyamount can't be negative")
+
         # Get the user's portfolio
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
+
         # Get the cryptocurrency
         db_currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency.upper()).first()
         if db_currency is None:
             return create_error_response(404, "Currency doesn't exist")
+
         # Find the pcurrency from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+
         # Value of all pcurrencies in the portfolio
         total_amount = 0
         pfolio_currency = None
         for pc in db_pcurrencies:
             if pc.cryptocurrency_id==db_currency.id:
                 pfolio_currency = pc
-                #break
             else:
                 coin = CryptoCurrency.query.filter_by(id=pc.cryptocurrency_id).first()
                 total_amount = total_amount + (pc.currencyAmount * coin.value)
         if pfolio_currency:
             total_amount = total_amount + request.json["currencyamount"]
             pfolio_currency.currencyAmount = request.json["currencyamount"]
+
             # Updates the total value of the portfolio
             db_portfolio.value = total_amount
             db.session.commit()
@@ -92,11 +101,12 @@ class PortfolioCurrency(Resource):
 
     def delete(self, account, pcurrency):
         """
-        Remove pcurrency from the user's portfolio 
+        DELETE method for removing pcurrency from the user's portfolio 
         """
         # Get the user's portfolio
         db_user = UserAccount.query.filter_by(name=account).first()
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
+
         # Get the cryptocurrency
         db_currency = CryptoCurrency.query.filter_by(abbreviation=pcurrency).first()
         
@@ -109,6 +119,7 @@ class PortfolioCurrency(Resource):
 
                 # Find all pcurrencies from users portfolio 
                 db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+
                 # Value of all pcurrencies in the portfolio
                 total_amount = 0
 
@@ -124,17 +135,20 @@ class PortfolioCurrency(Resource):
         return create_error_response(404, "Currency not found in user's portfolio")
 
 class PortfolioCurrencyCollection(Resource):
+
     def get(self, account):
         """ 
-        Get user's portfoliocurrency collection
+        GET method for getting all cryptocurrencies in portfolio
         """
         # Get user
         db_user = UserAccount.query.filter_by(name=account).first()
 
         if db_user is None:
             return create_error_response(404, "User not found")
+
         # Get user's portfolio
         db_portfolio = Portfolio.query.filter_by(id=db_user.portfolio_id).first()
+
         # Get portfoliocurrencies
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
 
@@ -160,6 +174,9 @@ class PortfolioCurrencyCollection(Resource):
 
 
     def post(self, account):
+        """
+        POST method for adding a new cryptocurrency to portfolio
+        """
         if not request.json:
             return create_error_response(415, "Unsupported media type")
         try:
@@ -189,6 +206,7 @@ class PortfolioCurrencyCollection(Resource):
 
         # Find all pcurrencies from users portfolio 
         db_pcurrencies = crypto_portfolio.query.filter_by(portfolio_id=db_portfolio.id).all()
+        
         # Value of all pcurrencies in the portfolio
         total_amount = 0
 
@@ -204,7 +222,7 @@ class PortfolioCurrencyCollection(Resource):
             "Location": url_for("api.portfoliocurrency", account=account, pcurrency=request.json["currencyname"])
         })
 
-
+"""
 def calculate_total_value(db_currencies, db_pcurrencies):
     tv = 0.0
     for p in db_pcurrencies:
@@ -213,3 +231,4 @@ def calculate_total_value(db_currencies, db_pcurrencies):
                 tv += p.currencyAmount * c.value
                 break
     return tv
+"""

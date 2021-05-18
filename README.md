@@ -38,5 +38,5 @@ Now after you have started the flask server, you can run the GUI client by typin
 
 # Tests
 Pytest is used for testing.
-To run the api tests navigate to the root folder and type `pytest test\api_test.py`.
+To run the api tests navigate to the root folder and type `pytest tests\api_test.py`.
 For database tests type `pytest tests\db_test.py` 

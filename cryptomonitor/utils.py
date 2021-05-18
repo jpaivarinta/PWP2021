@@ -92,16 +92,6 @@ class CryptoMonitorBuilder(MasonBuilder):
         }
         return schema
 
-    @staticmethod
-    def portfolio_schema():
-        pass
-
-    @staticmethod
-    def pcurrency_schema(): #IS THIS ONE NEEDED?
-        pass
-
-
-
 
     """ ACCOUNT controls """
 
@@ -207,6 +197,7 @@ class CryptoMonitorBuilder(MasonBuilder):
         )
 
     """ CRYPTOCURRENCY controls """
+
     def add_control_get_currency_info(self, currency):
         """ 
         Add control for getting cryptocurrency info.
@@ -221,6 +212,9 @@ class CryptoMonitorBuilder(MasonBuilder):
         )
 
     def add_control_all_currencies(self):
+        """
+        Adds control for getting all cryptocurrencies.
+        """
         self.add_control(
             "crymo:currencies-all",
             href=url_for("api.cryptocurrencycollection"),

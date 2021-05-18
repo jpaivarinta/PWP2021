@@ -10,12 +10,6 @@ Source and help from
 https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
-# cryptoPortfolio = db.Table("cryptoPortfolio",
-#     db.Column("cryptocurrency_id", db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True),
-#     db.Column("portfolio_id", db.Integer, db.ForeignKey("portfolio.id"), primary_key=True),
-#     db.Column("amount", db.Float)
-# )
-
 class crypto_portfolio(db.Model):
     cryptocurrency_id = db.Column( db.Integer, db.ForeignKey("cryptocurrency.id"), primary_key=True)
     portfolio_id = db.Column(db.Integer, db.ForeignKey("portfolio.id"), primary_key=True)

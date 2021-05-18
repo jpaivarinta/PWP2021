@@ -16,8 +16,11 @@ https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
 class AccountCollection(Resource):
+
     def get(self):
-        
+        """
+        GET method for getting all accounts
+        """
         body = CryptoMonitorBuilder(items = [])
         for single_account in UserAccount.query.all():
             item =  CryptoMonitorBuilder(     
@@ -44,6 +47,9 @@ class AccountCollection(Resource):
         )
 
     def post(self):
+        """
+        POST method for adding a new account
+        """
         if not request.json:
             return create_error_response(
                 415, "Unsupported media type",
@@ -63,15 +69,8 @@ class AccountCollection(Resource):
                 value=0.0
             )
             useraccount.portfolio = pf
-            """
-            cryptoPortfolio = crypto_portfolio(
-                currencyAmount=0.0,
-                portfolio=pf
-            )
-            """
             db.session.add(useraccount)
             db.session.add(pf)
-            #db.session.add(cryptoPortfolio)
             db.session.commit()
 
         except IntegrityError:
@@ -86,6 +85,9 @@ class AccountCollection(Resource):
 class AccountItem(Resource):
 
     def get(self, account):
+        """
+        GET method for getting single account
+        """
         single_account = UserAccount.query.filter_by(name=account).first()
         if single_account is None:
             return create_error_response(
@@ -103,7 +105,6 @@ class AccountItem(Resource):
         body.add_control("self", url_for("api.accountitem", account=account))
         body.add_control("profile", ACCOUNT_PROFILE) 
         body.add_control("portfolio", href=url_for("api.portfolioitem", account=single_account.name))
-        #body.add_control("collection", href=url_for("api.accountcollection"))
         body.add_control_all_accounts()
         body.add_control_edit_account(account=account)
         body.add_control_delete_account(account=account)
@@ -154,6 +155,9 @@ class AccountItem(Resource):
 
 
     def delete(self, account):
+        """
+        DELETE method for deleting single account
+        """
         single_account = UserAccount.query.filter_by(name=account).first()
         if single_account is None:
             return create_error_response(

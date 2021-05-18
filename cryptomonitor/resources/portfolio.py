@@ -13,7 +13,11 @@ https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
 class PortfolioItem(Resource):
+
     def get(self, account):
+        """
+        GET method for getting portfolio
+        """
         db_user = UserAccount.query.filter_by(name=account).first()
         if db_user is None:
             return create_error_response(

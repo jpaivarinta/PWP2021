@@ -385,6 +385,7 @@ class TestCryptoCurrencyItem(object):
 	INVALID_URL = "/api/currencies/DOGGO/"
 
 	def test_get(self, client):
+		""" Tests for GET method of CryptoCurrencyItem resource. """
 		resp = client.get(self.RESOURCE_URL)
 		assert resp.status_code == 200
 		body = json.loads(resp.data)
@@ -403,6 +404,7 @@ class TestPortfolioItem(object):
 	INVALID_URL = "/api/accounts/jorma/portfolio/"
 
 	def test_get(self, client):
+		""" Tests for GET method of PortfolioItem resource. """
 		resp = client.get(self.RESOURCE_URL)
 		print(resp)
 		assert resp.status_code == 200
@@ -421,6 +423,7 @@ class TestPortfolioCurrencyCollection(object):
 	RESOURCE_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/"
 
 	def test_get(self, client):
+		""" Tests for GET method of PortfolioCurrencyCollection resource. """
 		resp = client.get(self.RESOURCE_URL)
 		assert resp.status_code == 200
 		body = json.loads(resp.data)
@@ -432,6 +435,7 @@ class TestPortfolioCurrencyCollection(object):
 			_check_control_get_method("profile", client, item)
 
 	def test_post(self, client):
+		""" Tests for POST method of PortfolioCurrencyCollection resource. """
 		valid = _get_pcurrency_json("LTC", "666.666")
 		# test with wrong content type
 		resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
@@ -459,6 +463,7 @@ class TestPortfolioCurrency(object):
 	INVALID_URL = "/api/accounts/test-account-1/portfolio/pcurrencies/JOKUIHIME/"
 
 	def test_get(self, client):
+		""" Tests for GET method of PortfolioCurrency resource. """
 		resp = client.get(self.RESOURCE_URL)
 		assert resp.status_code == 200
 		body = json.loads(resp.data)
@@ -490,7 +495,6 @@ class TestPortfolioCurrency(object):
 		valid["currencyamount"] = str(-222.4)
 		resp = client.put(self.RESOURCE_URL, json=valid)
 		assert resp.status_code == 400
-
 
 		# Test for invalid json 400
 		valid.pop("currencyname")

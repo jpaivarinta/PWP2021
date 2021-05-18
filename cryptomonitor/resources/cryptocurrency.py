@@ -13,7 +13,11 @@ https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
 """
 
 class CryptoCurrencyItem(Resource):
+
     def get(self, currency):
+        """
+        GET method for getting single cryptocurrency
+        """
         currencyitem = CryptoCurrency.query.filter_by(abbreviation=currency.upper()).first()
         if currencyitem is None:
             return create_error_response(404, "Currency not in database")
@@ -34,7 +38,11 @@ class CryptoCurrencyItem(Resource):
         return Response(json.dumps(body, default=str), 200, mimetype=MASON)
 
 class CryptoCurrencyCollection(Resource):
+
     def get(self):
+        """
+        GET method for getting all cryptocurrencies known by API
+        """
         body = CryptoMonitorBuilder(items=[])
 
         body.add_namespace("crymo", LINK_RELATIONS_URL)

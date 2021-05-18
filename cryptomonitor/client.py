@@ -397,8 +397,8 @@ def get_all_accounts():
 def post_account(name, password):
     """
     Post a new account.
-    :param name: name for the account
-    :param password: password for the account
+    :param str name: name for the account
+    :param str password: password for the account
     :return: API's response.
     """
     data = {}
@@ -411,7 +411,7 @@ def post_account(name, password):
 def get_account(username):
     """
     Get account's information.
-    :param username: name of the account
+    :param str username: name of the account
     :return: API's response.
     """
     account_url = API_URL + "/api/accounts/" + str(username) + "/"
@@ -422,9 +422,9 @@ def get_account(username):
 def put_account(username, new_username, new_passwd):
     """
     Edit account's information.
-    :param username: name of the account
-    :param new_username: new name for the account
-    :param new_passwd: new password for the account
+    :param str username: name of the account
+    :param str new_username: new name for the account
+    :param str new_passwd: new password for the account
     :return: API's response.
     """
     data = {}
@@ -437,7 +437,7 @@ def put_account(username, new_username, new_passwd):
 def delete_account(username):
     """
     Delete account.
-    :param username: name of the account
+    :param str username: name of the account
     :return: API's response.
     """
     delete_url = API_URL + "/api/accounts/" + str(username) + "/"
@@ -452,7 +452,7 @@ def delete_account(username):
 def get_portfolio(username):
     """
     Get user's portfolio.
-    :param username: Name of the account
+    :param str username: Name of the account
     :return: Request response object from the server.
     """
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/"
@@ -463,8 +463,8 @@ def get_portfolio(username):
 def get_pcurrency(username, abbr):
     """
     Get a user's cryptocurrency in the portfolio.
-    :param username: Name of the account
-    :param abbr: Abbreviation of the cryptocurrency.
+    :param str username: Name of the account
+    :param str abbr: Abbreviation of the cryptocurrency.
     :return: Request response object from the server.
     """
     pcurrency_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/" + str(abbr).upper() + "/"
@@ -475,7 +475,7 @@ def get_pcurrency(username, abbr):
 def get_all_pcurrencies(username):
     """
     Get a collection of user's cryptocurrencies in the portfolio.
-    :param username: Name of the account
+    :param str username: Name of the account
     :return: Request response object from the server.
     """
     get_url = API_URL + "/api/accounts/" + str(username) + "/portfolio/pcurrencies/"
@@ -486,9 +486,9 @@ def get_all_pcurrencies(username):
 def post_pcurrency(username, currency_abbreviation, currency_amount):
     """
     Add new cryptocurrency to user's portfolio.
-    :param username: Name of the account
-    :param currency_abbreviation: Abbreviation of cryptocurrency.
-    :param currency_amount: Amount of cryptocurrency
+    :param str username: Name of the account
+    :param str currency_abbreviation: Abbreviation of cryptocurrency.
+    :param str currency_amount: Amount of cryptocurrency
     :return: Request response object from the server.
     :note currency_abbreviation must be one of the existing currencies in the database.
     """
@@ -502,9 +502,9 @@ def post_pcurrency(username, currency_abbreviation, currency_amount):
 def put_pcurrency(username, currency_abbreviation, currency_amount):
     """
     Edit cryptocurrency amount in user's portfolio.
-    :param username: Name of the account
-    :param currency_abbreviation: Abbreviation of cryptocurrency.
-    :param currency_amount: Amount of cryptocurrency
+    :param str username: Name of the account
+    :param str currency_abbreviation: Abbreviation of cryptocurrency.
+    :param str currency_amount: Amount of cryptocurrency
     :return: Request response object from the server.
     """
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username,
@@ -517,8 +517,8 @@ def put_pcurrency(username, currency_abbreviation, currency_amount):
 def delete_pcurrency(username, currency_abbreviation):
     """
     Remove cryptocurrency from user's portfolio.
-    :param username: Name of the account
-    :param currency_abbreviation: Abbreviation of cryptocurrency.
+    :param str username: Name of the account
+    :param str currency_abbreviation: Abbreviation of cryptocurrency.
     :return: Request response object from the server.
     """
     pcurrency_url = "{}/api/accounts/{}/portfolio/pcurrencies/{}/".format(API_URL, username,
@@ -543,7 +543,7 @@ def get_all_cryptocurrencies():
 def get_cryptocurrency(abbreviation):
     """ 
     Get a cryptocurrency known by the API.
-    :param abbreviation: Abbreviation of currency.
+    :param str abbreviation: Abbreviation of currency.
     :return: API's response.
     """
     currency_url = (API_URL + "/api/currencies/" + str(abbreviation).upper() + "/")
@@ -560,8 +560,8 @@ def clear_terminal():
 def try_login(username, password):
     """
     Try login to account.
-    :param username:
-    :param password:
+    :param str username: Username for the account
+    :param str password: Password for the account
     :return: Return True or False whether login succeeds.
     """
     accounts_resp = get_all_accounts()
@@ -582,9 +582,9 @@ def try_login(username, password):
 def try_register(name, password1, password2):
     """
     Try register new account
-    :param name:
-    :param password1:
-    :param password2: Retype password
+    :param str name: Username for the account
+    :param str password1: Password for the account
+    :param str password2: Retyped password
     :return: Returns a string indicating the result.
     """
     accounts = get_all_accounts()
@@ -615,8 +615,8 @@ def try_register(name, password1, password2):
 def get_pcurrency_json(abbreviation, amount):
     """
     Creates a JSON
-    :param abbreviation:
-    :param amount:
+    :param str abbreviation: Abbreviation of the cryptocurrency
+    :param str amount: amount of the cryptocurrency
     :return: json string
     """
     return {"currencyname": "{}".format(abbreviation.upper()), "currencyamount": float(amount)}
@@ -625,8 +625,8 @@ def get_pcurrency_json(abbreviation, amount):
 def get_account_json(name, password):
     """
     Creates a JSON
-    :param name:
-    :param password:
+    :param str name: Username of the account
+    :param str password: Password of the account
     :return: json string
     """
     return {"name": "{}".format(name), "password": "{}".format(password)}
@@ -635,7 +635,7 @@ def get_account_json(name, password):
 def check_float_input(input):
     """
     Checks if input is number.
-    :param input:
+    :param str input:
     :return: Boolean
     """
     try:
